@@ -8,6 +8,7 @@ import (
 
 func main() {
 	board := buildChessBoard()
+	generateMoves(board, "w")
 	printBoard(board)
 }
 
@@ -30,27 +31,27 @@ func printBoard(board map[int]string) {
 }
 
 func movePawn(board map[int]string, key int) {
-
+	fmt.Println("Moved pawn!")
 }
 
 func moveRook(board map[int]string, key int) {
-
+	fmt.Println("Moved rook!")
 }
 
 func moveKnight(board map[int]string, key int) {
-
+	fmt.Println("Moved knight!")
 }
 
 func moveBishop(board map[int]string, key int) {
-
+	fmt.Println("Moved bishop!")
 }
 
 func moveQueen(board map[int]string, key int) {
-
+	fmt.Println("Moved queen!")
 }
 
 func moveKing(board map[int]string, key int) {
-
+	fmt.Println("Moved king!")
 }
 
 // secondary move generation driver specific to white
@@ -75,6 +76,12 @@ func genWhite(board map[int]string) {
 			moveKing(board, key)
 		}
 		pieceCount = pieceCount + 1
+		if column == 7 {
+			column = 0
+			row = row + 1
+		} else {
+			column = column + 1
+		}
 	}
 }
 
@@ -100,6 +107,12 @@ func genBlack(board map[int]string) {
 			moveKing(board, key)
 		}
 		pieceCount = pieceCount + 1
+		if column == 7 {
+			column = 0
+			row = row + 1
+		} else {
+			column = column + 1
+		}
 	}
 }
 
