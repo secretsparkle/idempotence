@@ -8,7 +8,7 @@ import (
 
 func main() {
 	board := buildChessBoard()
-	fmt.Println("map: ", board)
+	fmt.Println(winState(board))
 }
 
 // build the board!
@@ -66,4 +66,23 @@ func buildChessBoard() map[int]string {
 		}
 	}
 	return board
+}
+
+func winState(board map[int]string) string {
+	whiteKing := false
+	blackKing := false
+	for _, square := range board {
+		if square == "wK" {
+			whiteKing = true
+		} else if square == "bK" {
+			blackKing = true
+		}
+	}
+	if !whiteKing {
+		return "b" // return black as the winner
+	} else if !blackKing {
+		return "w"
+	} else {
+		return "f" // return no one as the winner
+	}
 }
