@@ -44,32 +44,39 @@ func movePawn(board map[int]string, key int, player string) map[int]string {
 	if board[forward] == "_" {
 		board[forward] = board[key]
 		board[key] = "_"
+		return board
 	} else if strings.Contains(board[forward], enemy) && board[forward+10] == "_" {
 		board[forward] = "_"
 		board[forward+10] = board[key]
 		board[key] = "_"
+		return board
 	}
-	return board
+	return nil
 }
 
-func moveRook(board map[int]string, key int, player string) {
+func moveRook(board map[int]string, key int, player string) map[int]string {
 	fmt.Println("Moved rook!")
+	return nil
 }
 
-func moveKnight(board map[int]string, key int, player string) {
+func moveKnight(board map[int]string, key int, player string) map[int]string {
 	fmt.Println("Moved knight!")
+	return nil
 }
 
-func moveBishop(board map[int]string, key int, player string) {
+func moveBishop(board map[int]string, key int, player string) map[int]string {
 	fmt.Println("Moved bishop!")
+	return nil
 }
 
-func moveQueen(board map[int]string, key int, player string) {
+func moveQueen(board map[int]string, key int, player string) map[int]string {
 	fmt.Println("Moved queen!")
+	return nil
 }
 
-func moveKing(board map[int]string, key int, player string) {
+func moveKing(board map[int]string, key int, player string) map[int]string {
 	fmt.Println("Moved king!")
+	return nil
 }
 
 // secondary move generation driver specific to white
@@ -77,24 +84,41 @@ func genWhite(board map[int]string) {
 	pieceCount := 0
 	column := 0
 	row := 0
-	callCount := 0
-	exitCondition := true
-	for exitCondition {
+	keepGoing := true
+	moves := make([]map[int]string, 0)
+	for keepGoing {
 		key := (row * 10) + column
 		switch board[key] {
 		case "wP":
-			movePawn(board, key, "w")
-			callCount = callCount + 1
+			pawnMove := movePawn(board, key, "w")
+			if pawnMove != nil {
+				moves = append(moves, pawnMove)
+			}
 		case "wR":
-			moveRook(board, key, "w")
+			rookMove := moveRook(board, key, "w")
+			if rookMove != nil {
+				moves = append(moves, rookMove)
+			}
 		case "wKn":
-			moveKnight(board, key, "w")
+			knightMove := moveKnight(board, key, "w")
+			if knightMove != nil {
+				moves = append(moves, knightMove)
+			}
 		case "wB":
-			moveBishop(board, key, "w")
+			bishopMove := moveBishop(board, key, "w")
+			if bishopMove != nil {
+				moves = append(moves, bishopMove)
+			}
 		case "wQ":
-			moveQueen(board, key, "w")
+			queenMove := moveQueen(board, key, "w")
+			if queenMove != nil {
+				moves = append(moves, queenMove)
+			}
 		case "wK":
-			moveKing(board, key, "w")
+			kingMove := moveKing(board, key, "w")
+			if kingMove != nil {
+				moves = append(moves, kingMove)
+			}
 		}
 		pieceCount = pieceCount + 1
 		if column == 7 {
@@ -104,7 +128,7 @@ func genWhite(board map[int]string) {
 			column = column + 1
 		}
 		if row >= 16 || pieceCount >= 16 {
-			exitCondition = false
+			keepGoing = false
 		}
 	}
 }
@@ -114,8 +138,8 @@ func genBlack(board map[int]string) {
 	pieceCount := 0
 	column := 0
 	row := 0
-	exitCondition := true
-	for exitCondition {
+	keepGoing := true
+	for keepGoing {
 		key := (row * 10) + column
 		switch board[key] {
 		case "bP":
@@ -139,7 +163,7 @@ func genBlack(board map[int]string) {
 			column = column + 1
 		}
 		if row >= 16 || pieceCount >= 16 {
-			exitCondition = false
+			keepGoing = false
 		}
 	}
 }
