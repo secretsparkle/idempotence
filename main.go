@@ -59,7 +59,7 @@ func buildChessBoard() [8][8]string {
 					board[i][j] = "bR"
 				}
 			default:
-				board[i][j] = "_" // or this could be nil too
+				board[i][j] = "_"
 			}
 
 		}
