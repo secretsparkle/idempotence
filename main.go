@@ -60,7 +60,29 @@ func moveRook(board map[int]string, key int, player string) map[int]string {
 }
 
 func moveKnight(board map[int]string, key int, player string) map[int]string {
-	fmt.Println("Moved knight!")
+	// vert means goes up 2 and <direction> 1
+	vertRight := key + 21
+	vertLeft := key + 19
+	// horz means goes <direction> 2 and up 1
+	horzRight := key + 12
+	horzLeft := key + 8
+	if board[vertRight] == "_" {
+		board[vertRight] = board[key]
+		board[key] = "_"
+		return board
+	} else if board[vertLeft] == "_" {
+		board[vertLeft] = board[key]
+		board[key] = "_"
+		return board
+	} else if board[horzRight] == "_" {
+		board[horzRight] = board[key]
+		board[key] = "_"
+		return board
+	} else if board[horzLeft] == "_" {
+		board[horzLeft] = board[key]
+		board[key] = "_"
+		return board
+	}
 	return nil
 }
 
@@ -139,21 +161,40 @@ func genBlack(board map[int]string) {
 	column := 0
 	row := 0
 	keepGoing := true
+	moves := make([]map[int]string, 0)
 	for keepGoing {
 		key := (row * 10) + column
 		switch board[key] {
 		case "bP":
-			movePawn(board, key, "b")
+			pawnMove := movePawn(board, key, "b")
+			if pawnMove != nil {
+				moves = append(moves, pawnMove)
+			}
 		case "bR":
-			moveRook(board, key, "b")
+			rookMove := moveRook(board, key, "b")
+			if rookMove != nil {
+				moves = append(moves, rookMove)
+			}
 		case "bKn":
-			moveKnight(board, key, "b")
+			knightMove := moveKnight(board, key, "b")
+			if knightMove != nil {
+				moves = append(moves, knightMove)
+			}
 		case "bB":
-			moveBishop(board, key, "b")
+			bishopMove := moveBishop(board, key, "b")
+			if bishopMove != nil {
+				moves = append(moves, bishopMove)
+			}
 		case "bQ":
-			moveQueen(board, key, "b")
+			queenMove := moveQueen(board, key, "b")
+			if queenMove != nil {
+				moves = append(moves, queenMove)
+			}
 		case "bK":
-			moveKing(board, key, "b")
+			kingMove := moveKing(board, key, "b")
+			if kingMove != nil {
+				moves = append(moves, kingMove)
+			}
 		}
 		pieceCount = pieceCount + 1
 		if column == 7 {
@@ -168,12 +209,24 @@ func genBlack(board map[int]string) {
 	}
 }
 
+func copyBoard(board map[int]string) map[int]string {
+	boardCopy := make(map[int]string)
+	for i := 0; i < 8; i++ {
+		for j := 0; j < 8; j++ {
+			key := (i * 10) + j
+			boardCopy[key] = board[key]
+		}
+	}
+	return boardCopy
+}
+
 // driver to produce all available moves from a given board state
 func generateMoves(board map[int]string, player string) {
+	boardCopy := copyBoard(board)
 	if player == "w" {
-		genWhite(board)
+		genWhite(boardCopy)
 	} else if player == "b" {
-		genBlack(board)
+		genBlack(boardCopy)
 	}
 }
 
