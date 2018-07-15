@@ -100,42 +100,41 @@ func moveKing(board map[int]string, row int, col int, player string) map[int]str
 }
 
 // secondary move generation driver specific to white
-func genWhite(board map[int]string) {
+func genWhite(board [8][8]string) {
 	pieceCount := 0
-	column := 0
 	row := 0
+	col := 0
 	keepGoing := true
 	moves := make([]map[int]string, 0)
 	for keepGoing {
-		key := (row * 10) + column
-		switch board[key] {
+		switch board[row][col] {
 		case "wP":
-			pawnMove := movePawn(board, key, "w")
+			pawnMove := movePawn(board, row, col, "w")
 			if pawnMove != nil {
 				moves = append(moves, pawnMove)
 			}
 		case "wR":
-			rookMove := moveRook(board, key, "w")
+			rookMove := moveRook(board, row, col, "w")
 			if rookMove != nil {
 				moves = append(moves, rookMove)
 			}
 		case "wKn":
-			knightMove := moveKnight(board, key, "w")
+			knightMove := moveKnight(board, row, col, "w")
 			if knightMove != nil {
 				moves = append(moves, knightMove)
 			}
 		case "wB":
-			bishopMove := moveBishop(board, key, "w")
+			bishopMove := moveBishop(board, row, col, "w")
 			if bishopMove != nil {
 				moves = append(moves, bishopMove)
 			}
 		case "wQ":
-			queenMove := moveQueen(board, key, "w")
+			queenMove := moveQueen(board, row, col, "w")
 			if queenMove != nil {
 				moves = append(moves, queenMove)
 			}
 		case "wK":
-			kingMove := moveKing(board, key, "w")
+			kingMove := moveKing(board, row, col, "w")
 			if kingMove != nil {
 				moves = append(moves, kingMove)
 			}
@@ -147,7 +146,8 @@ func genWhite(board map[int]string) {
 		} else {
 			column = column + 1
 		}
-		if row >= 16 || pieceCount >= 16 {
+		// check the comment in the analogous part of genBlack
+		if row >= 8 || pieceCount >= 16 {
 			keepGoing = false
 		}
 	}
@@ -200,8 +200,8 @@ func genBlack(board [8][8]string) {
 		} else {
 			col += 1
 		}
-		// I understand what this code is for, but I don't understand how it
-		// is supposed to work. Plz review this Zac and tell me if I did this right!
+		// I understand this now, but shouldn't pieceCount change as pieces
+		// are taken throughout the game??
 		if row >= 8 || pieceCount >= 16 {
 			keepGoing = false
 		}
