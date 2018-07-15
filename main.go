@@ -207,19 +207,19 @@ func genBlack(board map[int]string) {
 	}
 }
 
-func copyBoard(board map[int]string) map[int]string {
-	boardCopy := make(map[int]string)
-	for i := 0; i < 8; i++ {
-		for j := 0; j < 8; j++ {
-			key := (i * 10) + j
-			boardCopy[key] = board[key]
+// do we even need this function now?
+func copyBoard(board [8][8]string) [8][8]string {
+	var boardCopy [8][8]string
+	for i, row := range board {
+		for j, square := range row {
+			boardCopy[i][j] = board[i][j]
 		}
 	}
 	return boardCopy
 }
 
 // driver to produce all available moves from a given board state
-func generateMoves(board map[int]string, player string) {
+func generateMoves(board [8][8]string, player string) {
 	boardCopy := copyBoard(board)
 	if player == "w" {
 		genWhite(boardCopy)
