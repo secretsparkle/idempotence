@@ -13,9 +13,10 @@ type Tree struct {
 }
 
 func main() {
-	board := buildChessBoard()
-	generateMoves(board, "w")
-	printBoard(board)
+	var game *Tree
+	game.Board = buildChessBoard()
+	generateMoves(game, "w")
+	printBoard(game.Board)
 }
 
 // prints a more readable board
@@ -165,38 +166,38 @@ func genBlack(board [8][8]string) {
 	row := 0
 	col := 0
 	keepGoing := true
-	moves := make([]map[int]string, 0)
+	var moves Tree
 	for keepGoing {
 		switch board[row][col] {
 		case "bP":
 			pawnMove := movePawn(board, row, col, "b")
 			if pawnMove != nil {
-				moves = append(moves, pawnMove)
+				moves.Children.append(pawnMove)
 			}
 		case "bR":
 			rookMove := moveRook(board, row, col, "b")
 			if rookMove != nil {
-				moves = append(moves, rookMove)
+				moves.Children.append(rookMove)
 			}
 		case "bKn":
 			knightMove := moveKnight(board, row, col, "b")
 			if knightMove != nil {
-				moves = append(moves, knightMove)
+				moves.Children.append(knightMove)
 			}
 		case "bB":
 			bishopMove := moveBishop(board, row, col, "b")
 			if bishopMove != nil {
-				moves = append(moves, bishopMove)
+				moves.Children.append(bishopMove)
 			}
 		case "bQ":
 			queenMove := moveQueen(board, row, col, "b")
 			if queenMove != nil {
-				moves = append(moves, queenMove)
+				moves.Children.append(queenMove)
 			}
 		case "bK":
 			kingMove := moveKing(board, row, col, "b")
 			if kingMove != nil {
-				moves = append(moves, kingMove)
+				moves.Children.append(kingMove)
 			}
 		}
 		pieceCount = pieceCount + 1
@@ -217,7 +218,7 @@ func genBlack(board [8][8]string) {
 // driver to produce all available moves from a given board state
 func generateMoves(tree *Tree, player string) {
 	if player == "w" {
-		tree.Children.append(genWhite(tree.Board))
+		tree.Children = genWhite(tree.Board)
 	} else if player == "b" {
 		tree.Children.append(genBlack(tree.Board))
 	}
