@@ -29,7 +29,7 @@ func printBoard(board [8][8]string) {
 	}
 }
 
-func movePawn(board map[int]string, key int, player string) map[int]string {
+func movePawn(board map[int]string, row int, col int, player string) map[int]string {
 	forward := 0
 	enemy := ""
 	if player == "w" {
@@ -52,12 +52,12 @@ func movePawn(board map[int]string, key int, player string) map[int]string {
 	return nil
 }
 
-func moveRook(board map[int]string, key int, player string) map[int]string {
+func moveRook(board map[int]string, row int, col int, player string) map[int]string {
 	fmt.Println("Moved rook!")
 	return nil
 }
 
-func moveKnight(board map[int]string, key int, player string) map[int]string {
+func moveKnight(board map[int]string, row int, col int, player string) map[int]string {
 	// vert means goes up 2 and <direction> 1
 	vertRight := key + 21
 	vertLeft := key + 19
@@ -84,17 +84,17 @@ func moveKnight(board map[int]string, key int, player string) map[int]string {
 	return nil
 }
 
-func moveBishop(board map[int]string, key int, player string) map[int]string {
+func moveBishop(board map[int]string, row int, col int, player string) map[int]string {
 	fmt.Println("Moved bishop!")
 	return nil
 }
 
-func moveQueen(board map[int]string, key int, player string) map[int]string {
+func moveQueen(board map[int]string, row int, col int, player string) map[int]string {
 	fmt.Println("Moved queen!")
 	return nil
 }
 
-func moveKing(board map[int]string, key int, player string) map[int]string {
+func moveKing(board map[int]string, row int, col int, player string) map[int]string {
 	fmt.Println("Moved king!")
 	return nil
 }
@@ -154,54 +154,55 @@ func genWhite(board map[int]string) {
 }
 
 // secondary move generation driver specific to black
-func genBlack(board map[int]string) {
+func genBlack(board [8][8]string) {
 	pieceCount := 0
-	column := 0
 	row := 0
+	col := 0
 	keepGoing := true
 	moves := make([]map[int]string, 0)
 	for keepGoing {
-		key := (row * 10) + column
-		switch board[key] {
+		switch board[row][col] {
 		case "bP":
-			pawnMove := movePawn(board, key, "b")
+			pawnMove := movePawn(board, row, col, "b")
 			if pawnMove != nil {
 				moves = append(moves, pawnMove)
 			}
 		case "bR":
-			rookMove := moveRook(board, key, "b")
+			rookMove := moveRook(board, row, col, "b")
 			if rookMove != nil {
 				moves = append(moves, rookMove)
 			}
 		case "bKn":
-			knightMove := moveKnight(board, key, "b")
+			knightMove := moveKnight(board, row, col, "b")
 			if knightMove != nil {
 				moves = append(moves, knightMove)
 			}
 		case "bB":
-			bishopMove := moveBishop(board, key, "b")
+			bishopMove := moveBishop(board, row, col, "b")
 			if bishopMove != nil {
 				moves = append(moves, bishopMove)
 			}
 		case "bQ":
-			queenMove := moveQueen(board, key, "b")
+			queenMove := moveQueen(board, row, col, "b")
 			if queenMove != nil {
 				moves = append(moves, queenMove)
 			}
 		case "bK":
-			kingMove := moveKing(board, key, "b")
+			kingMove := moveKing(board, row, col, "b")
 			if kingMove != nil {
 				moves = append(moves, kingMove)
 			}
 		}
 		pieceCount = pieceCount + 1
-		if column == 7 {
-			column = 0
+		if col == 7 {
+			col = 0
 			row = row + 1
 		} else {
-			column = column + 1
+			col += 1
 		}
-		if row >= 16 || pieceCount >= 16 {
+		// I understand what this code is for, but I don't understand how it
+		// is supposed to work. Plz review this Zac and tell me if I did this right!
+		if row >= 8 || pieceCount >= 16 {
 			keepGoing = false
 		}
 	}
