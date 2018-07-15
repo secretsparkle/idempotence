@@ -1,5 +1,4 @@
 // Main function of chess engine
-
 package main
 
 import (
@@ -14,7 +13,21 @@ func main() {
 }
 
 // prints a more readable board
-func printBoard(board map[int]string) {
+func printBoard(board [8][8]string) {
+	for _, row := range board {
+		for _, square := range row {
+			fmt.Printf(square)
+			if square == "wKn" || square == "bKn" {
+				fmt.Printf("  ")
+			} else if square == "_" {
+				fmt.Printf("    ")
+			} else {
+				fmt.Printf("   ")
+			}
+		}
+		fmt.Println()
+	}
+	/*
 	for i := 0; i < 8; i++ {
 		for j := 0; j < 8; j++ {
 			key := (i * 10) + j
@@ -29,6 +42,7 @@ func printBoard(board map[int]string) {
 		}
 		fmt.Println()
 	}
+*/
 }
 
 func movePawn(board map[int]string, key int, player string) map[int]string {
@@ -228,58 +242,60 @@ func generateMoves(board map[int]string, player string) {
 	} else if player == "b" {
 		genBlack(boardCopy)
 	}
+=======
+>>>>>>> b1cd9c191ebf8609f4a6b5f630f0e9a036076f7b
 }
 
 // build the board!
-func buildChessBoard() map[int]string {
-	board := make(map[int]string)
+func buildChessBoard() [8][8]string {
+	var board [8][8]string
 	for i := 0; i < 8; i++ {
 		for j := 0; j < 8; j++ {
 			switch i {
 			case 0:
 				switch j {
 				case 0:
-					board[(i*10)+j] = "wR"
+					board[i][j] = "wR"
 				case 1:
-					board[(i*10)+j] = "wKn"
+					board[i][j] = "wKn"
 				case 2:
-					board[(i*10)+j] = "wB"
+					board[i][j] = "wB"
 				case 3:
-					board[(i*10)+j] = "wQ"
+					board[i][j] = "wQ"
 				case 4:
-					board[(i*10)+j] = "wK"
+					board[i][j] = "wK"
 				case 5:
-					board[(i*10)+j] = "wB"
+					board[i][j] = "wB"
 				case 6:
-					board[(i*10)+j] = "wKn"
+					board[i][j] = "wKn"
 				case 7:
-					board[(i*10)+j] = "wR"
+					board[i][j] = "wR"
 				}
 			case 1:
-				board[(i*10)+j] = "wP"
+				board[i][j] = "wP"
 			case 6:
-				board[(i*10)+j] = "bP"
+				board[i][j] = "bP"
 			case 7:
 				switch j {
 				case 0:
-					board[(i*10)+j] = "bR"
+					board[i][j] = "bR"
 				case 1:
-					board[(i*10)+j] = "bKn"
+					board[i][j] = "bKn"
 				case 2:
-					board[(i*10)+j] = "bB"
+					board[i][j] = "bB"
 				case 3:
-					board[(i*10)+j] = "bQ"
+					board[i][j] = "bQ"
 				case 4:
-					board[(i*10)+j] = "bK"
+					board[i][j] = "bK"
 				case 5:
-					board[(i*10)+j] = "bB"
+					board[i][j] = "bB"
 				case 6:
-					board[(i*10)+j] = "bKn"
+					board[i][j] = "bKn"
 				case 7:
-					board[(i*10)+j] = "bR"
+					board[i][j] = "bR"
 				}
 			default:
-				board[(i*10)+j] = "_" // or this could be nil too
+				board[i][j] = "_"
 			}
 
 		}
