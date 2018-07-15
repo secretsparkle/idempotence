@@ -68,14 +68,16 @@ func buildChessBoard() [8][8]string {
 	return board
 }
 
-func winState(board map[int]string) string {
+func winState(board [8][8]string) string {
 	whiteKing := false
 	blackKing := false
-	for _, square := range board {
-		if square == "wK" {
-			whiteKing = true
-		} else if square == "bK" {
-			blackKing = true
+	for _, row := range board {
+		for _, square := range row {
+			if square == "wK" {
+				whiteKing = true
+			} else if square == "bK" {
+				blackKing = true
+			}
 		}
 	}
 	if !whiteKing {
