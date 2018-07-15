@@ -215,11 +215,11 @@ func genBlack(board [8][8]string) {
 }
 
 // driver to produce all available moves from a given board state
-func generateMoves(board [8][8]string, player string) {
+func generateMoves(tree *Tree, player string) {
 	if player == "w" {
-		genWhite(board)
+		tree.Children.append(genWhite(tree.Board))
 	} else if player == "b" {
-		genBlack(board)
+		tree.Children.append(genBlack(tree.Board))
 	}
 	// END OF NEW CODE
 }
