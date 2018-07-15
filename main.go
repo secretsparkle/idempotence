@@ -27,22 +27,6 @@ func printBoard(board [8][8]string) {
 		}
 		fmt.Println()
 	}
-	/*
-	for i := 0; i < 8; i++ {
-		for j := 0; j < 8; j++ {
-			key := (i * 10) + j
-			fmt.Printf(board[key])
-			if board[key] == "wKn" || board[key] == "bKn" {
-				fmt.Printf("  ")
-			} else if board[key] == "_" {
-				fmt.Printf("    ")
-			} else {
-				fmt.Printf("   ")
-			}
-		}
-		fmt.Println()
-	}
-*/
 }
 
 func movePawn(board map[int]string, key int, player string) map[int]string {
@@ -242,8 +226,7 @@ func generateMoves(board map[int]string, player string) {
 	} else if player == "b" {
 		genBlack(boardCopy)
 	}
-=======
->>>>>>> b1cd9c191ebf8609f4a6b5f630f0e9a036076f7b
+	// END OF NEW CODE
 }
 
 // build the board!
