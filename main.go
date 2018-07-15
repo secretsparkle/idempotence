@@ -208,24 +208,12 @@ func genBlack(board [8][8]string) {
 	}
 }
 
-// do we even need this function now?
-func copyBoard(board [8][8]string) [8][8]string {
-	var boardCopy [8][8]string
-	for i, row := range board {
-		for j, square := range row {
-			boardCopy[i][j] = board[i][j]
-		}
-	}
-	return boardCopy
-}
-
 // driver to produce all available moves from a given board state
 func generateMoves(board [8][8]string, player string) {
-	boardCopy := copyBoard(board)
 	if player == "w" {
-		genWhite(boardCopy)
+		genWhite(board)
 	} else if player == "b" {
-		genBlack(boardCopy)
+		genBlack(board)
 	}
 	// END OF NEW CODE
 }
