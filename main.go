@@ -36,24 +36,25 @@ func printBoard(board [8][8]string) {
 	}
 }
 
-func movePawn(board map[int]string, row int, col int, player string) map[int]string {
+// need to account for pawn moving two spaces
+func movePawn(board [8][8]string, row int, col int, player string) [8][8]string {
 	forward := 0
 	enemy := ""
 	if player == "w" {
-		forward = key + 10
+		forward = row + 1
 		enemy = "b"
 	} else if player == "b" {
-		forward = key - 10
+		forward = row - 1
 		enemy = "w"
 	}
-	if board[forward] == "_" {
-		board[forward] = board[key]
-		board[key] = "_"
+	if board[forward][col] == "_" {
+		board[forward][col] = board[row][col]
+		board[row][col] = "_"
 		return board
-	} else if strings.Contains(board[forward], enemy) && board[forward+10] == "_" {
-		board[forward] = "_"
-		board[forward+10] = board[key]
-		board[key] = "_"
+	} else if strings.Contains(board[forward][col], enemy) && board[forward+1][col] == "_" { // what circumstance does this code account for?
+		board[forward][col] = "_"
+		board[forward+1][col] = board[row][col]
+		board[row][col] = "_"
 		return board
 	}
 	return nil
@@ -112,48 +113,48 @@ func genWhite(board [8][8]string) {
 	row := 0
 	col := 0
 	keepGoing := true
-	moves := make([]map[int]string, 0)
+	var moves Tree
 	for keepGoing {
 		switch board[row][col] {
 		case "wP":
 			pawnMove := movePawn(board, row, col, "w")
 			if pawnMove != nil {
-				moves = append(moves, pawnMove)
+				moves.Children.append(pawnMove)
 			}
 		case "wR":
 			rookMove := moveRook(board, row, col, "w")
 			if rookMove != nil {
-				moves = append(moves, rookMove)
+				moves.Children.append(rookMove)
 			}
 		case "wKn":
 			knightMove := moveKnight(board, row, col, "w")
 			if knightMove != nil {
-				moves = append(moves, knightMove)
+				moves.Children.append(knightMove)
 			}
 		case "wB":
 			bishopMove := moveBishop(board, row, col, "w")
 			if bishopMove != nil {
-				moves = append(moves, bishopMove)
+				moves.Children.append(bishopMove)
 			}
 		case "wQ":
 			queenMove := moveQueen(board, row, col, "w")
 			if queenMove != nil {
-				moves = append(moves, queenMove)
+				moves.Children.append(queenMove)
 			}
 		case "wK":
 			kingMove := moveKing(board, row, col, "w")
 			if kingMove != nil {
-				moves = append(moves, kingMove)
+				moves.Children.append(kingMove)
 			}
 		}
+		// we need to be sure to come back and deal with pieceCount
 		pieceCount = pieceCount + 1
 		if column == 7 {
 			column = 0
-			row = row + 1
+			row += 1
 		} else {
-			column = column + 1
+			column += 1
 		}
-		// check the comment in the analogous part of genBlack
 		if row >= 8 || pieceCount >= 16 {
 			keepGoing = false
 		}
@@ -200,15 +201,14 @@ func genBlack(board [8][8]string) {
 				moves.Children.append(kingMove)
 			}
 		}
+		// we need to be sure to come back and deal with pieceCount
 		pieceCount = pieceCount + 1
 		if col == 7 {
 			col = 0
-			row = row + 1
+			row += 1
 		} else {
 			col += 1
 		}
-		// I understand this now, but shouldn't pieceCount change as pieces
-		// are taken throughout the game??
 		if row >= 8 || pieceCount >= 16 {
 			keepGoing = false
 		}
