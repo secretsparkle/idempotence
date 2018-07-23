@@ -37,6 +37,7 @@ func printBoard(board [8][8]string) {
 }
 
 // need to account for pawn moving two spaces
+// also need to account if pawn would move off the board
 func movePawn(board [8][8]string, row int, col int, player string) [8][8]string {
 	forward := 0
 	enemy := ""
@@ -57,7 +58,7 @@ func movePawn(board [8][8]string, row int, col int, player string) [8][8]string 
 		board[row][col] = "_"
 		return board
 	}
-	return nil
+	return nil // what should be returned here? (Can't be nil)
 }
 
 func moveRook(board map[int]string, row int, col int, player string) map[int]string {
@@ -65,31 +66,66 @@ func moveRook(board map[int]string, row int, col int, player string) map[int]str
 	return nil
 }
 
-func moveKnight(board map[int]string, row int, col int, player string) map[int]string {
-	// vert means goes up 2 and <direction> 1
-	vertRight := key + 21
-	vertLeft := key + 19
-	// horz means goes <direction> 2 and up 1
-	horzRight := key + 12
-	horzLeft := key + 8
-	if board[vertRight] == "_" {
-		board[vertRight] = board[key]
-		board[key] = "_"
-		return board
-	} else if board[vertLeft] == "_" {
-		board[vertLeft] = board[key]
-		board[key] = "_"
-		return board
-	} else if board[horzRight] == "_" {
-		board[horzRight] = board[key]
-		board[key] = "_"
-		return board
-	} else if board[horzLeft] == "_" {
-		board[horzLeft] = board[key]
-		board[key] = "_"
-		return board
+// need to specifiy which move we want the knight to make as a parameter?
+func moveKnight(board [8][8]string, row int, col int, main string, modifier string, direction string, player string) [8][8]string {
+	// TODO: STILL NEED TO CHECK IF MOVE IS LEGAL (ON BOARD), MAKE SEP FUNCTION?
+	// vertMain means go up or down 2
+	vertMainUp := row + 2
+	vertMainDown := row - 2
+	vertUp := row + 1
+	vertDown := row - 1
+	// horzMain means goes right or left 2
+	horzMainRight := col + 2
+	horzMainLeft := col - 2
+	horzRight := col + 1
+	horzLeft := col - 1
+	// could probably make a function to handle the gruntwork of each case
+	// as the same lines of code are used over and over again
+	// also, this could easily be made into an attacking function as well,
+	// just by checking if the space to be moved to is an enemy space
+	// TODO: give this function attacking functionality
+	if main == "vert" && modifier == "up" {
+		if direction == "right" && board[vertMainUp][horzRight] == "_" {
+			board[vertMainUp][horzRight] = board[row][col]
+			board[row][col] = "_"
+			return board
+		} else if direction == "left" && board[vertMainUp][horzLeft] == "_" {
+			board[vertMainUp][horzLeft] = board[row][col]
+			board[row][col] = "_"
+			return board
+		}
+	} else if main == "vert" && modifier == "down" {
+		if direction == "right" && board[vertMainDown][horzRight] == "_" {
+			board[vertMainDown][horzRight] = board[row][col]
+			board[row][col] = "_"
+			return board
+		} else if direction == "left" && board[vertMainDown][horzLeft] == "_" {
+			board[vertMainDown][horzLeft] = board[row][col]
+			board[row][col] = "_"
+			return board
+		}
+	} else if main == "horz" && modifier == "right" {
+		if direction == "up" && board[horzMainRight][vertUp] == "_" {
+			board[horzMainRight][vertUp] = board[row][col]
+			board[row][col] = "_"
+			return board
+		} else if direction == "down" && board[horzMainRight][vertDown] == "_" {
+			board[horzMainRight][vertDown] = board[row][col]
+			board[row][col] = "_"
+			return board
+		}
+	} else if main == "horz" && modifier == "left" {
+		if direction == "up" && board[horzMainLeft][vertUp] == "_" {
+			board[horzMainLeft][vertUp] = board[row][col]
+			board[row][col] = "_"
+			return board
+		} else if direction == "down" && board[horzMainLeft][vertDown] == "_" {
+			board[horzMainLeft][vertDown] = board[row][col]
+			board[row][col] = "_"
+			return board
+		}
 	}
-	return nil
+	return nil // same question as movePawn, what should the default return type be?
 }
 
 func moveBishop(board map[int]string, row int, col int, player string) map[int]string {
@@ -127,7 +163,7 @@ func genWhite(board [8][8]string) {
 				moves.Children.append(rookMove)
 			}
 		case "wKn":
-			knightMove := moveKnight(board, row, col, "w")
+			knightMove := moveKnight(board, row, col, "vert", "up", "right", "w")
 			if knightMove != nil {
 				moves.Children.append(knightMove)
 			}
