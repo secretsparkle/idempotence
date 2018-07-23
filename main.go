@@ -36,6 +36,14 @@ func printBoard(board [8][8]string) {
 	}
 }
 
+func withinBoundaries(moveRow int, moveCol int) bool {
+	if moveRow >= 0 || moveRow < 8 || moveCol >= 0 || moveCol < 8 {
+		return true
+	} else {
+		return false
+	}
+}
+
 // need to account for pawn moving two spaces
 // also need to account if pawn would move off the board
 func movePawn(board [8][8]string, row int, col int, player string) [8][8]string {
@@ -66,6 +74,12 @@ func moveRook(board map[int]string, row int, col int, player string) map[int]str
 	return nil
 }
 
+/*
+func 8=D~(.Y.)() {
+      fmt.Println("Aww yeeee")
+}
+*/
+
 // need to specifiy which move we want the knight to make as a parameter?
 func moveKnight(board [8][8]string, row int, col int, main string, modifier string, direction string, player string) [8][8]string {
 	// TODO: STILL NEED TO CHECK IF MOVE IS LEGAL (ON BOARD), MAKE SEP FUNCTION?
@@ -85,41 +99,41 @@ func moveKnight(board [8][8]string, row int, col int, main string, modifier stri
 	// just by checking if the space to be moved to is an enemy space
 	// TODO: give this function attacking functionality
 	if main == "vert" && modifier == "up" {
-		if direction == "right" && board[vertMainUp][horzRight] == "_" {
+		if direction == "right" && board[vertMainUp][horzRight] == "_" && withinBoundaries(vertMainUp, horzRight) == true {
 			board[vertMainUp][horzRight] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "left" && board[vertMainUp][horzLeft] == "_" {
+		} else if direction == "left" && board[vertMainUp][horzLeft] == "_" && withinBoundaries(vertMainUp, horzLeft) == true {
 			board[vertMainUp][horzLeft] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	} else if main == "vert" && modifier == "down" {
-		if direction == "right" && board[vertMainDown][horzRight] == "_" {
+		if direction == "right" && board[vertMainDown][horzRight] == "_" && withinBoundaries(vertMainDown, horzRight) == true {
 			board[vertMainDown][horzRight] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "left" && board[vertMainDown][horzLeft] == "_" {
+		} else if direction == "left" && board[vertMainDown][horzLeft] == "_" && withinBoundaries(vertMainDown, horzLeft) == true {
 			board[vertMainDown][horzLeft] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	} else if main == "horz" && modifier == "right" {
-		if direction == "up" && board[horzMainRight][vertUp] == "_" {
+		if direction == "up" && board[horzMainRight][vertUp] == "_" && withinBoundaries(horzMainRight, vertUp) == true {
 			board[horzMainRight][vertUp] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "down" && board[horzMainRight][vertDown] == "_" {
+		} else if direction == "down" && board[horzMainRight][vertDown] == "_" && withinBoundaries(horzMainRight, vertDown) == true {
 			board[horzMainRight][vertDown] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	} else if main == "horz" && modifier == "left" {
-		if direction == "up" && board[horzMainLeft][vertUp] == "_" {
+		if direction == "up" && board[horzMainLeft][vertUp] == "_" && withinBoundaries(horzMainLeft, vertUp) == true {
 			board[horzMainLeft][vertUp] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "down" && board[horzMainLeft][vertDown] == "_" {
+		} else if direction == "down" && board[horzMainLeft][vertDown] == "_" && withinBoundaries(horzMainLeft, vertDown) == true {
 			board[horzMainLeft][vertDown] = board[row][col]
 			board[row][col] = "_"
 			return board
@@ -164,6 +178,7 @@ func genWhite(board [8][8]string) {
 			}
 		case "wKn":
 			knightMove := moveKnight(board, row, col, "vert", "up", "right", "w")
+			// need to add all permutations
 			if knightMove != nil {
 				moves.Children.append(knightMove)
 			}
