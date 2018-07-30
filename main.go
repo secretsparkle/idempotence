@@ -36,14 +36,6 @@ func printBoard(board [8][8]string) {
 	}
 }
 
-func withinBoundaries(moveRow int, moveCol int) bool {
-	if moveRow >= 0 || moveRow < 8 || moveCol >= 0 || moveCol < 8 {
-		return true
-	} else {
-		return false
-	}
-}
-
 // need to account for pawn moving two spaces
 // also need to account if pawn would move off the board
 func movePawn(board [8][8]string, row int, col int, player string) [8][8]string {
@@ -81,7 +73,7 @@ func 8=D~(.Y.)() {
 */
 
 // need to specifiy which move we want the knight to make as a parameter?
-func moveKnight(board [8][8]string, row int, col int, main string, modifier string, direction string, player string) [8][8]string {
+func moveKnight(board [8][8]string, row int, col int, main string, modifier string, direction string, player string, enemy string) [8][8]string {
 	// TODO: STILL NEED TO CHECK IF MOVE IS LEGAL (ON BOARD), MAKE SEP FUNCTION?
 	// vertMain means go up or down 2
 	vertMainUp := row + 2
@@ -99,41 +91,41 @@ func moveKnight(board [8][8]string, row int, col int, main string, modifier stri
 	// just by checking if the space to be moved to is an enemy space
 	// TODO: give this function attacking functionality
 	if main == "vert" && modifier == "up" {
-		if direction == "right" && board[vertMainUp][horzRight] == "_" && withinBoundaries(vertMainUp, horzRight) == true {
+		if direction == "right" && (board[vertMainUp][horzRight] == "_" || string(board[vertMainUp][horzRight][0]) == enemy) && withinBoundaries(vertMainUp, horzRight) == true {
 			board[vertMainUp][horzRight] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "left" && board[vertMainUp][horzLeft] == "_" && withinBoundaries(vertMainUp, horzLeft) == true {
+		} else if direction == "left" && (board[vertMainUp][horzLeft] == "_" || string(board[vertMainUp][horzLeft][0]) == enemy) && withinBoundaries(vertMainUp, horzLeft) == true {
 			board[vertMainUp][horzLeft] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	} else if main == "vert" && modifier == "down" {
-		if direction == "right" && board[vertMainDown][horzRight] == "_" && withinBoundaries(vertMainDown, horzRight) == true {
+		if direction == "right" && (board[vertMainDown][horzRight] == "_" || string(board[vertMainDown][horzRight][0]) == enemy) && withinBoundaries(vertMainDown, horzRight) == true {
 			board[vertMainDown][horzRight] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "left" && board[vertMainDown][horzLeft] == "_" && withinBoundaries(vertMainDown, horzLeft) == true {
+		} else if direction == "left" && (board[vertMainDown][horzLeft] == "_" || string(board[vertMainDown][horzLeft][0]) == enemy) && withinBoundaries(vertMainDown, horzLeft) == true {
 			board[vertMainDown][horzLeft] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	} else if main == "horz" && modifier == "right" {
-		if direction == "up" && board[horzMainRight][vertUp] == "_" && withinBoundaries(horzMainRight, vertUp) == true {
+		if direction == "up" && (board[horzMainRight][vertUp] == "_" || string(board[horzMainRight][vertUp][0]) == enemy) && withinBoundaries(horzMainRight, vertUp) == true {
 			board[horzMainRight][vertUp] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "down" && board[horzMainRight][vertDown] == "_" && withinBoundaries(horzMainRight, vertDown) == true {
+		} else if direction == "down" && (board[horzMainRight][vertDown] == "_" || string(board[horzMainRight][vertDown][0]) == enemy) && withinBoundaries(horzMainRight, vertDown) == true {
 			board[horzMainRight][vertDown] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	} else if main == "horz" && modifier == "left" {
-		if direction == "up" && board[horzMainLeft][vertUp] == "_" && withinBoundaries(horzMainLeft, vertUp) == true {
+		if direction == "up" && (board[horzMainLeft][vertUp] == "_" || string(board[horzMainLeft][vertUp][0]) == enemy) && withinBoundaries(horzMainLeft, vertUp) == true {
 			board[horzMainLeft][vertUp] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "down" && board[horzMainLeft][vertDown] == "_" && withinBoundaries(horzMainLeft, vertDown) == true {
+		} else if direction == "down" && (board[horzMainLeft][vertDown] == "_" || string(board[horzMainLeft][vertDown][0]) == enemy) && withinBoundaries(horzMainLeft, vertDown) == true {
 			board[horzMainLeft][vertDown] = board[row][col]
 			board[row][col] = "_"
 			return board
@@ -163,13 +155,15 @@ func genWhite(board [8][8]string) {
 	row := 0
 	col := 0
 	keepGoing := true
-	var moves Tree
+	var moves []*Tree
 	for keepGoing {
 		switch board[row][col] {
 		case "wP":
 			pawnMove := movePawn(board, row, col, "w")
 			if pawnMove != nil {
-				moves.Children.append(pawnMove)
+				var move *Tree
+				move.Board = pawnMove
+				moves = append(moves, move)
 			}
 		case "wR":
 			rookMove := moveRook(board, row, col, "w")
@@ -177,8 +171,7 @@ func genWhite(board [8][8]string) {
 				moves.Children.append(rookMove)
 			}
 		case "wKn":
-			knightMove := moveKnight(board, row, col, "vert", "up", "right", "w")
-			// need to add all permutations
+			knightMove := moveKnight(board, row, col, "vert", "up", "right", "w", "b")
 			if knightMove != nil {
 				moves.Children.append(knightMove)
 			}
@@ -224,7 +217,7 @@ func genBlack(board [8][8]string) {
 		case "bP":
 			pawnMove := movePawn(board, row, col, "b")
 			if pawnMove != nil {
-				moves.Children.append(pawnMove)
+				moves.Children = append(moves.Children, pawnMove)
 			}
 		case "bR":
 			rookMove := moveRook(board, row, col, "b")
@@ -232,7 +225,7 @@ func genBlack(board [8][8]string) {
 				moves.Children.append(rookMove)
 			}
 		case "bKn":
-			knightMove := moveKnight(board, row, col, "b")
+			knightMove := moveKnight(board, row, col, "vert", "up", "right", "b", "w")
 			if knightMove != nil {
 				moves.Children.append(knightMove)
 			}
@@ -274,6 +267,14 @@ func generateMoves(tree *Tree, player string) {
 		tree.Children.append(genBlack(tree.Board))
 	}
 	// END OF NEW CODE
+}
+
+func withinBoundaries(moveRow int, moveCol int) bool {
+	if moveRow >= 0 || moveRow < 8 || moveCol >= 0 || moveCol < 8 {
+		return true
+	} else {
+		return false
+	}
 }
 
 // build the board!
