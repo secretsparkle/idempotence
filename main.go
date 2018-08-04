@@ -66,14 +66,11 @@ func moveRook(board map[int]string, row int, col int, player string) map[int]str
 	return nil
 }
 
-/*
-func 8=D~(.Y.)() {
-      fmt.Println("Aww yeeee")
-}
-*/
-
 // need to specifiy which move we want the knight to make as a parameter?
 func moveKnight(board [8][8]string, row int, col int, main string, modifier string, direction string, player string, enemy string) [8][8]string {
+	// main = vert hors
+	// modifier = up down
+	// direction = right left
 	// TODO: STILL NEED TO CHECK IF MOVE IS LEGAL (ON BOARD), MAKE SEP FUNCTION?
 	// vertMain means go up or down 2
 	vertMainUp := row + 2
@@ -222,27 +219,35 @@ func genBlack(board [8][8]string) {
 		case "bR":
 			rookMove := moveRook(board, row, col, "b")
 			if rookMove != nil {
-				moves.Children.append(rookMove)
+				moves.Children = append(moves.Children, rookMove)
 			}
 		case "bKn":
-			knightMove := moveKnight(board, row, col, "vert", "up", "right", "b", "w")
-			if knightMove != nil {
-				moves.Children.append(knightMove)
-			}
+			knightMoveVUR := moveKnight(board, row, col, "vert", "up", "right", "b", "w")
+			knightMoveVUL := moveKnight(board, row, col, "vert", "up", "left", "b", "w")
+			knightMoveVDR := moveKnight(board, row, col, "vert", "down", "right", "b", "w")
+			knightMoveVDL := moveKnight(board, row, col, "vert", "down", "left", "b", "w")
+			knightMoveHUR := moveKnight(board, row, col, "horz", "up", "right", "b", "w")
+			knightMoveHUL := moveKnight(board, row, col, "horz", "up", "left", "b", "w")
+			knightMoveHDR := moveKnight(board, row, col, "horz", "down", "right", "b", "w")
+			knightMoveHDL := moveKnight(board, row, col, "horz", "down", "left", "b", "w")
+			// for empty board, possibly place "E" at board[0][0]?
+			// if knightMoveVUR != EMPTY {
+			//	moves.Children = append(moves.Children, knightMoveVUR)
+			//}
 		case "bB":
 			bishopMove := moveBishop(board, row, col, "b")
 			if bishopMove != nil {
-				moves.Children.append(bishopMove)
+				moves.Children = append(moves.Children, bishopMove)
 			}
 		case "bQ":
 			queenMove := moveQueen(board, row, col, "b")
 			if queenMove != nil {
-				moves.Children.append(queenMove)
+				moves.Children = append(moves.Children, queenMove)
 			}
 		case "bK":
 			kingMove := moveKing(board, row, col, "b")
 			if kingMove != nil {
-				moves.Children.append(kingMove)
+				moves.Children = append(moves.Children, kingMove)
 			}
 		}
 		// we need to be sure to come back and deal with pieceCount
