@@ -13,10 +13,15 @@ type Tree struct {
 }
 
 func main() {
-	var game *Tree
+	game := new(Tree)
 	game.Board = buildChessBoard()
-	generateMoves(game, "w")
+	generateMoves(game, "b")
 	printBoard(game.Board)
+	fmt.Println(game.Children[0].Board)
+	for index, possibilities := range game.Children {
+		fmt.Println(index)
+		printBoard(possibilities.Board)
+	}
 }
 
 // prints a more readable board
@@ -41,6 +46,9 @@ func printBoard(board [8][8]string) {
 func movePawn(board [8][8]string, row int, col int, player string) [8][8]string {
 	forward := 0
 	enemy := ""
+	// create default empty board
+	var emptyBoard [8][8]string
+	emptyBoard[0][0] = "E"
 	if player == "w" {
 		forward = row + 1
 		enemy = "b"
@@ -58,7 +66,7 @@ func movePawn(board [8][8]string, row int, col int, player string) [8][8]string 
 		board[row][col] = "_"
 		return board
 	}
-	return nil // what should be returned here? (Can't be nil)
+	return emptyBoard
 }
 
 func moveRook(board map[int]string, row int, col int, player string) map[int]string {
@@ -82,53 +90,56 @@ func moveKnight(board [8][8]string, row int, col int, main string, modifier stri
 	horzMainLeft := col - 2
 	horzRight := col + 1
 	horzLeft := col - 1
+	// create empty board in case checks fail
+	var emptyBoard [8][8]string
+	emptyBoard[0][0] = "E"
 	// could probably make a function to handle the gruntwork of each case
 	// as the same lines of code are used over and over again
 	// also, this could easily be made into an attacking function as well,
 	// just by checking if the space to be moved to is an enemy space
 	// TODO: give this function attacking functionality
 	if main == "vert" && modifier == "up" {
-		if direction == "right" && (board[vertMainUp][horzRight] == "_" || string(board[vertMainUp][horzRight][0]) == enemy) && withinBoundaries(vertMainUp, horzRight) == true {
+		if direction == "right" && withinBoundaries(vertMainUp, horzRight) == true && (board[vertMainUp][horzRight] == "_" || string(board[vertMainUp][horzRight]) == enemy) {
 			board[vertMainUp][horzRight] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "left" && (board[vertMainUp][horzLeft] == "_" || string(board[vertMainUp][horzLeft][0]) == enemy) && withinBoundaries(vertMainUp, horzLeft) == true {
+		} else if direction == "left" && withinBoundaries(vertMainUp, horzLeft) == true && (board[vertMainUp][horzLeft] == "_" || string(board[vertMainUp][horzLeft]) == enemy) {
 			board[vertMainUp][horzLeft] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	} else if main == "vert" && modifier == "down" {
-		if direction == "right" && (board[vertMainDown][horzRight] == "_" || string(board[vertMainDown][horzRight][0]) == enemy) && withinBoundaries(vertMainDown, horzRight) == true {
+		if direction == "right" && withinBoundaries(vertMainDown, horzRight) == true && (board[vertMainDown][horzRight] == "_" || string(board[vertMainDown][horzRight]) == enemy) {
 			board[vertMainDown][horzRight] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "left" && (board[vertMainDown][horzLeft] == "_" || string(board[vertMainDown][horzLeft][0]) == enemy) && withinBoundaries(vertMainDown, horzLeft) == true {
+		} else if direction == "left" && withinBoundaries(vertMainDown, horzLeft) == true && (board[vertMainDown][horzLeft] == "_" || string(board[vertMainDown][horzLeft]) == enemy) {
 			board[vertMainDown][horzLeft] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	} else if main == "horz" && modifier == "right" {
-		if direction == "up" && (board[horzMainRight][vertUp] == "_" || string(board[horzMainRight][vertUp][0]) == enemy) && withinBoundaries(horzMainRight, vertUp) == true {
+		if direction == "up" && withinBoundaries(horzMainRight, vertUp) == true && (board[horzMainRight][vertUp] == "_" || string(board[horzMainRight][vertUp]) == enemy) {
 			board[horzMainRight][vertUp] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "down" && (board[horzMainRight][vertDown] == "_" || string(board[horzMainRight][vertDown][0]) == enemy) && withinBoundaries(horzMainRight, vertDown) == true {
+		} else if direction == "down" && withinBoundaries(horzMainRight, vertDown) == true && (board[horzMainRight][vertDown] == "_" || string(board[horzMainRight][vertDown]) == enemy) {
 			board[horzMainRight][vertDown] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	} else if main == "horz" && modifier == "left" {
-		if direction == "up" && (board[horzMainLeft][vertUp] == "_" || string(board[horzMainLeft][vertUp][0]) == enemy) && withinBoundaries(horzMainLeft, vertUp) == true {
+		if direction == "up" && withinBoundaries(horzMainLeft, vertUp) == true && (board[horzMainLeft][vertUp] == "_" || string(board[horzMainLeft][vertUp]) == enemy) {
 			board[horzMainLeft][vertUp] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "down" && (board[horzMainLeft][vertDown] == "_" || string(board[horzMainLeft][vertDown][0]) == enemy) && withinBoundaries(horzMainLeft, vertDown) == true {
+		} else if direction == "down" && withinBoundaries(horzMainLeft, vertDown) == true && (board[horzMainLeft][vertDown] == "_" || string(board[horzMainLeft][vertDown]) == enemy) {
 			board[horzMainLeft][vertDown] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	}
-	return nil // same question as movePawn, what should the default return type be?
+	return emptyBoard
 }
 
 func moveBishop(board map[int]string, row int, col int, player string) map[int]string {
@@ -146,6 +157,7 @@ func moveKing(board map[int]string, row int, col int, player string) map[int]str
 	return nil
 }
 
+/*
 // secondary move generation driver specific to white
 func genWhite(board [8][8]string) {
 	pieceCount := 0
@@ -201,81 +213,90 @@ func genWhite(board [8][8]string) {
 		}
 	}
 }
+*/
 
 // secondary move generation driver specific to black
-func genBlack(board [8][8]string) {
-	pieceCount := 0
-	row := 0
-	col := 0
-	keepGoing := true
-	var moves Tree
-	for keepGoing {
-		switch board[row][col] {
-		case "bP":
-			pawnMove := movePawn(board, row, col, "b")
-			if pawnMove != nil {
-				moves.Children = append(moves.Children, pawnMove)
+func genBlack(board [8][8]string) *Tree {
+	moves := new(Tree)
+	for row := 0; row < 8; row++ {
+		for col := 0; col < 8; col++ {
+			switch board[row][col] {
+			case "bP":
+				pawnMove := movePawn(board, row, col, "b")
+				if pawnMove[0][0] != "E" {
+					newBranch := new(Tree)
+					newBranch.Board = pawnMove
+					moves.Children = append(moves.Children, newBranch)
+				}
+				/*
+					case "bR":
+						rookMove := moveRook(board, row, col, "b")
+						if rookMove != nil {
+							moves.Children = append(moves.Children, rookMove)
+						}
+				*/
+			case "bKn":
+				var knightMoves [][8][8]string
+				knightMoveVUR := moveKnight(board, row, col, "vert", "up", "right", "b", "w")
+				knightMoves = append(knightMoves, knightMoveVUR)
+				knightMoveVUL := moveKnight(board, row, col, "vert", "up", "left", "b", "w")
+				knightMoves = append(knightMoves, knightMoveVUL)
+				knightMoveVDR := moveKnight(board, row, col, "vert", "down", "right", "b", "w")
+				knightMoves = append(knightMoves, knightMoveVDR)
+				knightMoveVDL := moveKnight(board, row, col, "vert", "down", "left", "b", "w")
+				knightMoves = append(knightMoves, knightMoveVDL)
+				knightMoveHUR := moveKnight(board, row, col, "horz", "up", "right", "b", "w")
+				knightMoves = append(knightMoves, knightMoveHUR)
+				knightMoveHUL := moveKnight(board, row, col, "horz", "up", "left", "b", "w")
+				knightMoves = append(knightMoves, knightMoveHUL)
+				knightMoveHDR := moveKnight(board, row, col, "horz", "down", "right", "b", "w")
+				knightMoves = append(knightMoves, knightMoveHDR)
+				knightMoveHDL := moveKnight(board, row, col, "horz", "down", "left", "b", "w")
+				knightMoves = append(knightMoves, knightMoveHDL)
+				for _, move := range knightMoves {
+					if move[0][0] != "E" {
+						newBranch := new(Tree)
+						newBranch.Board = move
+						moves.Children = append(moves.Children, newBranch)
+					}
+				}
+				/*
+					case "bB":
+						bishopMove := moveBishop(board, row, col, "b")
+						if bishopMove != nil {
+							moves.Children = append(moves.Children, bishopMove)
+						}
+					case "bQ":
+						queenMove := moveQueen(board, row, col, "b")
+						if queenMove != nil {
+							moves.Children = append(moves.Children, queenMove)
+						}
+					case "bK":
+						kingMove := moveKing(board, row, col, "b")
+						if kingMove != nil {
+							moves.Children = append(moves.Children, kingMove)
+						}
+				*/
+
 			}
-		case "bR":
-			rookMove := moveRook(board, row, col, "b")
-			if rookMove != nil {
-				moves.Children = append(moves.Children, rookMove)
-			}
-		case "bKn":
-			knightMoveVUR := moveKnight(board, row, col, "vert", "up", "right", "b", "w")
-			knightMoveVUL := moveKnight(board, row, col, "vert", "up", "left", "b", "w")
-			knightMoveVDR := moveKnight(board, row, col, "vert", "down", "right", "b", "w")
-			knightMoveVDL := moveKnight(board, row, col, "vert", "down", "left", "b", "w")
-			knightMoveHUR := moveKnight(board, row, col, "horz", "up", "right", "b", "w")
-			knightMoveHUL := moveKnight(board, row, col, "horz", "up", "left", "b", "w")
-			knightMoveHDR := moveKnight(board, row, col, "horz", "down", "right", "b", "w")
-			knightMoveHDL := moveKnight(board, row, col, "horz", "down", "left", "b", "w")
-			// for empty board, possibly place "E" at board[0][0]?
-			// if knightMoveVUR != EMPTY {
-			//	moves.Children = append(moves.Children, knightMoveVUR)
-			//}
-		case "bB":
-			bishopMove := moveBishop(board, row, col, "b")
-			if bishopMove != nil {
-				moves.Children = append(moves.Children, bishopMove)
-			}
-		case "bQ":
-			queenMove := moveQueen(board, row, col, "b")
-			if queenMove != nil {
-				moves.Children = append(moves.Children, queenMove)
-			}
-		case "bK":
-			kingMove := moveKing(board, row, col, "b")
-			if kingMove != nil {
-				moves.Children = append(moves.Children, kingMove)
-			}
-		}
-		// we need to be sure to come back and deal with pieceCount
-		pieceCount = pieceCount + 1
-		if col == 7 {
-			col = 0
-			row += 1
-		} else {
-			col += 1
-		}
-		if row >= 8 || pieceCount >= 16 {
-			keepGoing = false
 		}
 	}
+	return moves
 }
 
 // driver to produce all available moves from a given board state
 func generateMoves(tree *Tree, player string) {
 	if player == "w" {
-		tree.Children = genWhite(tree.Board)
+		//tree.Children = genWhite(tree.Board)
+		fmt.Println("genWhite")
 	} else if player == "b" {
-		tree.Children.append(genBlack(tree.Board))
+		generatedBoards := genBlack(tree.Board)
+		tree.Children = generatedBoards.Children
 	}
-	// END OF NEW CODE
 }
 
 func withinBoundaries(moveRow int, moveCol int) bool {
-	if moveRow >= 0 || moveRow < 8 || moveCol >= 0 || moveCol < 8 {
+	if (moveRow >= 0 && moveRow < 8) && (moveCol >= 0 && moveCol < 8) {
 		return true
 	} else {
 		return false
