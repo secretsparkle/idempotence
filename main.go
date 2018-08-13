@@ -125,41 +125,41 @@ func moveKnight(board [8][8]string, row int, col int, main string, modifier stri
 	// could probably make a function to handle the gruntwork of each case
 	// as the same lines of code are used over and over again
 	if main == "vert" && modifier == "up" {
-		if direction == "right" && withinBoundaries(vertMainUp, horzRight) == true && (board[vertMainUp][horzRight] == "_" || string(board[vertMainUp][horzRight]) == enemy) {
+		if direction == "right" && withinBoundaries(vertMainUp, horzRight) == true && (board[vertMainUp][horzRight] == "_" || string(board[vertMainUp][horzRight][0]) == enemy) {
 			board[vertMainUp][horzRight] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "left" && withinBoundaries(vertMainUp, horzLeft) == true && (board[vertMainUp][horzLeft] == "_" || string(board[vertMainUp][horzLeft]) == enemy) {
+		} else if direction == "left" && withinBoundaries(vertMainUp, horzLeft) == true && (board[vertMainUp][horzLeft] == "_" || string(board[vertMainUp][horzLeft][0]) == enemy) {
 			board[vertMainUp][horzLeft] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	} else if main == "vert" && modifier == "down" {
-		if direction == "right" && withinBoundaries(vertMainDown, horzRight) == true && (board[vertMainDown][horzRight] == "_" || string(board[vertMainDown][horzRight]) == enemy) {
+		if direction == "right" && withinBoundaries(vertMainDown, horzRight) == true && (board[vertMainDown][horzRight] == "_" || string(board[vertMainDown][horzRight][0]) == enemy) {
 			board[vertMainDown][horzRight] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "left" && withinBoundaries(vertMainDown, horzLeft) == true && (board[vertMainDown][horzLeft] == "_" || string(board[vertMainDown][horzLeft]) == enemy) {
+		} else if direction == "left" && withinBoundaries(vertMainDown, horzLeft) == true && (board[vertMainDown][horzLeft] == "_" || string(board[vertMainDown][horzLeft][0]) == enemy) {
 			board[vertMainDown][horzLeft] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	} else if main == "horz" && modifier == "right" {
-		if direction == "up" && withinBoundaries(horzMainRight, vertUp) == true && (board[horzMainRight][vertUp] == "_" || string(board[horzMainRight][vertUp]) == enemy) {
+		if direction == "up" && withinBoundaries(horzMainRight, vertUp) == true && (board[horzMainRight][vertUp] == "_" || string(board[horzMainRight][vertUp][0]) == enemy) {
 			board[horzMainRight][vertUp] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "down" && withinBoundaries(horzMainRight, vertDown) == true && (board[horzMainRight][vertDown] == "_" || string(board[horzMainRight][vertDown]) == enemy) {
+		} else if direction == "down" && withinBoundaries(horzMainRight, vertDown) == true && (board[horzMainRight][vertDown] == "_" || string(board[horzMainRight][vertDown][0]) == enemy) {
 			board[horzMainRight][vertDown] = board[row][col]
 			board[row][col] = "_"
 			return board
 		}
 	} else if main == "horz" && modifier == "left" {
-		if direction == "up" && withinBoundaries(horzMainLeft, vertUp) == true && (board[horzMainLeft][vertUp] == "_" || string(board[horzMainLeft][vertUp]) == enemy) {
+		if direction == "up" && withinBoundaries(horzMainLeft, vertUp) == true && (board[horzMainLeft][vertUp] == "_" || string(board[horzMainLeft][vertUp][0]) == enemy) {
 			board[horzMainLeft][vertUp] = board[row][col]
 			board[row][col] = "_"
 			return board
-		} else if direction == "down" && withinBoundaries(horzMainLeft, vertDown) == true && (board[horzMainLeft][vertDown] == "_" || string(board[horzMainLeft][vertDown]) == enemy) {
+		} else if direction == "down" && withinBoundaries(horzMainLeft, vertDown) == true && (board[horzMainLeft][vertDown] == "_" || string(board[horzMainLeft][vertDown][0]) == enemy) {
 			board[horzMainLeft][vertDown] = board[row][col]
 			board[row][col] = "_"
 			return board
