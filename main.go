@@ -124,6 +124,11 @@ func moveKnight(board [8][8]string, row int, col int, main string, modifier stri
 	emptyBoard[0][0] = "E"
 	// could probably make a function to handle the gruntwork of each case
 	// as the same lines of code are used over and over again
+	//TODO: I goofed! There should be 16 possible moves, but I only listed 8.
+	// We're missing the possible moves where the knight goes one up,down,right,left;
+	// then it goes, two up,down,right,left -- the comibations of these. Should be
+	// easy to implement, the machinery is already in place. This may be a good
+	// opportunity to write a function that handles each case.
 	if main == "vert" && modifier == "up" {
 		if direction == "right" && withinBoundaries(vertMainUp, horzRight) == true && (board[vertMainUp][horzRight] == "_" || string(board[vertMainUp][horzRight][0]) == enemy) {
 			board[vertMainUp][horzRight] = board[row][col]
