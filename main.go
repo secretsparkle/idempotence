@@ -15,11 +15,9 @@ type Tree struct {
 func main() {
 	game := new(Tree)
 	game.Board = buildChessBoard()
-	generateMoves(game, "b")
+	generateMoves(game, "w")
 	printBoard(game.Board)
-	fmt.Println(game.Children[0].Board)
-	for index, possibilities := range game.Children {
-		fmt.Println(index)
+	for _, possibilities := range game.Children {
 		printBoard(possibilities.Board)
 	}
 }
@@ -95,9 +93,6 @@ func moveKnight(board [8][8]string, row int, col int, main string, modifier stri
 	emptyBoard[0][0] = "E"
 	// could probably make a function to handle the gruntwork of each case
 	// as the same lines of code are used over and over again
-	// also, this could easily be made into an attacking function as well,
-	// just by checking if the space to be moved to is an enemy space
-	// TODO: give this function attacking functionality
 	if main == "vert" && modifier == "up" {
 		if direction == "right" && withinBoundaries(vertMainUp, horzRight) == true && (board[vertMainUp][horzRight] == "_" || string(board[vertMainUp][horzRight]) == enemy) {
 			board[vertMainUp][horzRight] = board[row][col]
@@ -157,63 +152,74 @@ func moveKing(board map[int]string, row int, col int, player string) map[int]str
 	return nil
 }
 
-/*
 // secondary move generation driver specific to white
-func genWhite(board [8][8]string) {
-	pieceCount := 0
-	row := 0
-	col := 0
-	keepGoing := true
-	var moves []*Tree
-	for keepGoing {
-		switch board[row][col] {
-		case "wP":
-			pawnMove := movePawn(board, row, col, "w")
-			if pawnMove != nil {
-				var move *Tree
-				move.Board = pawnMove
-				moves = append(moves, move)
+func genWhite(board [8][8]string) *Tree {
+	moves := new(Tree)
+	for row := 0; row < 8; row++ {
+		for col := 0; col < 8; col++ {
+			switch board[row][col] {
+			case "wP":
+				pawnMove := movePawn(board, row, col, "w")
+				if pawnMove[0][0] != "E" {
+					newBranch := new(Tree)
+					newBranch.Board = pawnMove
+					moves.Children = append(moves.Children, newBranch)
+				}
+				/*
+					case "wR":
+						rookMove := moveRook(board, row, col, "w")
+						if rookMove != nil {
+							moves.Children = append(moves.Children, rookMove)
+						}
+				*/
+			case "wKn":
+				var knightMoves [][8][8]string
+				knightMoveVUR := moveKnight(board, row, col, "vert", "up", "right", "w", "b")
+				knightMoves = append(knightMoves, knightMoveVUR)
+				knightMoveVUL := moveKnight(board, row, col, "vert", "up", "left", "w", "b")
+				knightMoves = append(knightMoves, knightMoveVUL)
+				knightMoveVDR := moveKnight(board, row, col, "vert", "down", "right", "w", "b")
+				knightMoves = append(knightMoves, knightMoveVDR)
+				knightMoveVDL := moveKnight(board, row, col, "vert", "down", "left", "w", "b")
+				knightMoves = append(knightMoves, knightMoveVDL)
+				knightMoveHUR := moveKnight(board, row, col, "horz", "up", "right", "w", "b")
+				knightMoves = append(knightMoves, knightMoveHUR)
+				knightMoveHUL := moveKnight(board, row, col, "horz", "up", "left", "w", "b")
+				knightMoves = append(knightMoves, knightMoveHUL)
+				knightMoveHDR := moveKnight(board, row, col, "horz", "down", "right", "w", "b")
+				knightMoves = append(knightMoves, knightMoveHDR)
+				knightMoveHDL := moveKnight(board, row, col, "horz", "down", "left", "w", "b")
+				knightMoves = append(knightMoves, knightMoveHDL)
+				for _, move := range knightMoves {
+					if move[0][0] != "E" {
+						newBranch := new(Tree)
+						newBranch.Board = move
+						moves.Children = append(moves.Children, newBranch)
+					}
+				}
+				/*
+					case "wB":
+						bishopMove := moveBishop(board, row, col, "w")
+						if bishopMove != nil {
+							moves.Children = append(moves.Children, bishopMove)
+						}
+					case "wQ":
+						queenMove := moveQueen(board, row, col, "w")
+						if queenMove != nil {
+							moves.Children = append(moves.Children, queenMove)
+						}
+					case "wK":
+						kingMove := moveKing(board, row, col, "w")
+						if kingMove != nil {
+							moves.Children = append(moves.Children, kingMove)
+						}
+				*/
+
 			}
-		case "wR":
-			rookMove := moveRook(board, row, col, "w")
-			if rookMove != nil {
-				moves.Children.append(rookMove)
-			}
-		case "wKn":
-			knightMove := moveKnight(board, row, col, "vert", "up", "right", "w", "b")
-			if knightMove != nil {
-				moves.Children.append(knightMove)
-			}
-		case "wB":
-			bishopMove := moveBishop(board, row, col, "w")
-			if bishopMove != nil {
-				moves.Children.append(bishopMove)
-			}
-		case "wQ":
-			queenMove := moveQueen(board, row, col, "w")
-			if queenMove != nil {
-				moves.Children.append(queenMove)
-			}
-		case "wK":
-			kingMove := moveKing(board, row, col, "w")
-			if kingMove != nil {
-				moves.Children.append(kingMove)
-			}
-		}
-		// we need to be sure to come back and deal with pieceCount
-		pieceCount = pieceCount + 1
-		if column == 7 {
-			column = 0
-			row += 1
-		} else {
-			column += 1
-		}
-		if row >= 8 || pieceCount >= 16 {
-			keepGoing = false
 		}
 	}
+	return moves
 }
-*/
 
 // secondary move generation driver specific to black
 func genBlack(board [8][8]string) *Tree {
@@ -287,7 +293,8 @@ func genBlack(board [8][8]string) *Tree {
 // driver to produce all available moves from a given board state
 func generateMoves(tree *Tree, player string) {
 	if player == "w" {
-		//tree.Children = genWhite(tree.Board)
+		generatedBoards := genWhite(tree.Board)
+		tree.Children = generatedBoards.Children
 		fmt.Println("genWhite")
 	} else if player == "b" {
 		generatedBoards := genBlack(tree.Board)
