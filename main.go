@@ -41,26 +41,57 @@ func printBoard(board [8][8]string) {
 
 // need to account for pawn moving two spaces
 // also need to account if pawn would move off the board
-func movePawn(board [8][8]string, row int, col int, player string) [8][8]string {
-	forward := 0
+func movePawn(board [8][8]string, row int, col int, player string, moveType string) [8][8]string {
+	newRow := -1
+	newCol := -1
 	enemy := ""
 	// create default empty board
 	var emptyBoard [8][8]string
 	emptyBoard[0][0] = "E"
 	if player == "w" {
-		forward = row + 1
 		enemy = "b"
+		// cols aren't changing on forward moves, but
+		// I kept in the corresponding operations to be
+		// verbose and transparent
+		switch moveType {
+		case "forward":
+			newRow = row + 1
+			newCol = col
+		case "forwardTwo":
+			newRow = row + 2
+			newCol = col
+		case "leftAttack":
+			newRow = row + 1
+			newCol = col - 1
+		case "rightAttack":
+			newRow = row + 1
+			newCol = col + 1
+		}
 	} else if player == "b" {
-		forward = row - 1
 		enemy = "w"
+		switch moveType {
+		case "forward":
+			newRow = row - 1
+			newCol = col
+		case "forwardTwo":
+			newRow = row - 2
+			newCol = col
+		case "leftAttack":
+			newRow = row - 1
+			newCol = col - 1
+		case "rightAttack":
+			newRow = row - 1
+			newCol = col + 1
+		}
 	}
-	if board[forward][col] == "_" {
-		board[forward][col] = board[row][col]
+	if newRow == -1 || !withinBoundaries(newRow, newCol) {
+		return emptyBoard
+	} else if strings.Contains(moveType, "forward") && board[newRow][newCol] == "_" {
+		board[newRow][newCol] = board[row][col]
 		board[row][col] = "_"
 		return board
-	} else if strings.Contains(board[forward][col], enemy) && board[forward+1][col] == "_" { // what circumstance does this code account for?
-		board[forward][col] = "_"
-		board[forward+1][col] = board[row][col]
+	} else if strings.Contains(moveType, "Attack") && string(board[newRow][newCol][0]) == enemy {
+		board[newRow][newCol] = board[row][col]
 		board[row][col] = "_"
 		return board
 	}
@@ -74,7 +105,7 @@ func moveRook(board map[int]string, row int, col int, player string) map[int]str
 
 // need to specifiy which move we want the knight to make as a parameter?
 func moveKnight(board [8][8]string, row int, col int, main string, modifier string, direction string, player string, enemy string) [8][8]string {
-	// main = vert hors
+	// main = vert horz
 	// modifier = up down
 	// direction = right left
 	// TODO: STILL NEED TO CHECK IF MOVE IS LEGAL (ON BOARD), MAKE SEP FUNCTION?
@@ -159,11 +190,21 @@ func genWhite(board [8][8]string) *Tree {
 		for col := 0; col < 8; col++ {
 			switch board[row][col] {
 			case "wP":
-				pawnMove := movePawn(board, row, col, "w")
-				if pawnMove[0][0] != "E" {
-					newBranch := new(Tree)
-					newBranch.Board = pawnMove
-					moves.Children = append(moves.Children, newBranch)
+				var pawnMoves [][8][8]string
+				pawnMoveForward := movePawn(board, row, col, "w", "forward")
+				pawnMoves = append(pawnMoves, pawnMoveForward)
+				pawnMoveForwardTwo := movePawn(board, row, col, "w", "forwardTwo")
+				pawnMoves = append(pawnMoves, pawnMoveForwardTwo)
+				pawnMoveLeftAttack := movePawn(board, row, col, "w", "leftAttack")
+				pawnMoves = append(pawnMoves, pawnMoveLeftAttack)
+				pawnMoveRightAttack := movePawn(board, row, col, "w", "rightAttack")
+				pawnMoves = append(pawnMoves, pawnMoveRightAttack)
+				for _, move := range pawnMoves {
+					if move[0][0] != "E" {
+						newBranch := new(Tree)
+						newBranch.Board = move
+						moves.Children = append(moves.Children, newBranch)
+					}
 				}
 				/*
 					case "wR":
@@ -228,7 +269,7 @@ func genBlack(board [8][8]string) *Tree {
 		for col := 0; col < 8; col++ {
 			switch board[row][col] {
 			case "bP":
-				pawnMove := movePawn(board, row, col, "b")
+				pawnMove := movePawn(board, row, col, "b", "forward")
 				if pawnMove[0][0] != "E" {
 					newBranch := new(Tree)
 					newBranch.Board = pawnMove
