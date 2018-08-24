@@ -98,12 +98,11 @@ func movePawn(board [8][8]string, row int, col int, player string, moveType stri
 	return emptyBoard
 }
 
-func moveRook(board map[int]string, row int, col int, player string) map[int]string {
-	fmt.Println("Moved rook!")
-	return nil
+func moveRook(board [8][8]string, row int, col int, newRow int, newCol int, enemy string) [8][8]string {
+	return move(board, row, col, newRow, newCol, enemy)
 }
 
-func moveKnightHelper(board [8][8]string, row int, col int, newRow int, newCol int, enemy string) [8][8]string {
+func move(board [8][8]string, row int, col int, newRow int, newCol int, enemy string) [8][8]string {
 	var emptyBoard [8][8]string
 	emptyBoard[0][0] = "E"
 	if withinBoundaries(newRow, newCol) == true && (board[newRow][newCol] == "_" || string(board[newRow][newCol][0]) == enemy) {
@@ -116,7 +115,7 @@ func moveKnightHelper(board [8][8]string, row int, col int, newRow int, newCol i
 }
 
 // need to specifiy which move we want the knight to make as a parameter?
-func moveKnight(board [8][8]string, row int, col int, main string, direction string, player string, enemy string) [8][8]string {
+func moveKnight(board [8][8]string, row int, col int, main string, direction string, enemy string) [8][8]string {
 	// main = vert horz
 	// direction = right left up down
 	vertMajorUp := row + 2
@@ -133,45 +132,47 @@ func moveKnight(board [8][8]string, row int, col int, main string, direction str
 	emptyBoard[0][0] = "E"
 	switch {
 	case main == "vertMajorUp" && direction == "right":
-		return moveKnightHelper(board, row, col, vertMajorUp, horzMinorRight, enemy) // 1
+		return move(board, row, col, vertMajorUp, horzMinorRight, enemy) // 1
 	case main == "vertMajorUp" && direction == "left":
-		return moveKnightHelper(board, row, col, vertMajorUp, horzMinorLeft, enemy) // 2
+		return move(board, row, col, vertMajorUp, horzMinorLeft, enemy) // 2
 	case main == "vertMajorDown" && direction == "right":
-		return moveKnightHelper(board, row, col, vertMajorDown, horzMinorRight, enemy) // 3
+		return move(board, row, col, vertMajorDown, horzMinorRight, enemy) // 3
 	case main == "vertMajorDown" && direction == "left":
-		return moveKnightHelper(board, row, col, vertMajorDown, horzMinorLeft, enemy) // 4
+		return move(board, row, col, vertMajorDown, horzMinorLeft, enemy) // 4
 	case main == "vertMinorUp" && direction == "right":
-		return moveKnightHelper(board, row, col, vertMinorUp, horzMajorRight, enemy) // 5
+		return move(board, row, col, vertMinorUp, horzMajorRight, enemy) // 5
 	case main == "vertMinorUp" && direction == "left":
-		return moveKnightHelper(board, row, col, vertMinorUp, horzMajorLeft, enemy) // 6
+		return move(board, row, col, vertMinorUp, horzMajorLeft, enemy) // 6
 	case main == "vertMinorDown" && direction == "right":
-		return moveKnightHelper(board, row, col, vertMinorDown, horzMajorRight, enemy) // 7
+		return move(board, row, col, vertMinorDown, horzMajorRight, enemy) // 7
 	case main == "vertMinorDown" && direction == "left":
-		return moveKnightHelper(board, row, col, vertMinorDown, horzMajorLeft, enemy) // 8
+		return move(board, row, col, vertMinorDown, horzMajorLeft, enemy) // 8
 	case main == "horzMajorRight" && direction == "up":
-		return moveKnightHelper(board, row, col, horzMajorRight, vertMinorUp, enemy) // 9
+		return move(board, row, col, horzMajorRight, vertMinorUp, enemy) // 9
 	case main == "horzMajorRight" && direction == "down":
-		return moveKnightHelper(board, row, col, horzMajorRight, vertMinorDown, enemy) // 10
+		return move(board, row, col, horzMajorRight, vertMinorDown, enemy) // 10
 	case main == "horzMajorLeft" && direction == "up":
-		return moveKnightHelper(board, row, col, horzMajorLeft, vertMinorUp, enemy) // 11
+		return move(board, row, col, horzMajorLeft, vertMinorUp, enemy) // 11
 	case main == "horzMajorLeft" && direction == "down":
-		return moveKnightHelper(board, row, col, horzMajorLeft, vertMinorDown, enemy) // 12
+		return move(board, row, col, horzMajorLeft, vertMinorDown, enemy) // 12
 	case main == "horzMinorRight" && direction == "up":
-		return moveKnightHelper(board, row, col, horzMinorRight, vertMajorUp, enemy) // 13
+		return move(board, row, col, horzMinorRight, vertMajorUp, enemy) // 13
 	case main == "horzMinorRight" && direction == "down":
-		return moveKnightHelper(board, row, col, horzMinorRight, vertMajorDown, enemy) // 14
+		return move(board, row, col, horzMinorRight, vertMajorDown, enemy) // 14
 	case main == "horzMinorLeft" && direction == "up":
-		return moveKnightHelper(board, row, col, horzMinorLeft, vertMajorUp, enemy) // 15
+		return move(board, row, col, horzMinorLeft, vertMajorUp, enemy) // 15
 	case main == "horzMinorLeft" && direction == "down":
-		return moveKnightHelper(board, row, col, horzMinorLeft, vertMajorDown, enemy) // 16
+		return move(board, row, col, horzMinorLeft, vertMajorDown, enemy) // 16
 	default:
 		return emptyBoard
 	}
 }
 
-func moveBishop(board map[int]string, row int, col int, player string) map[int]string {
+func moveBishop(board map[int]string, row int, col int, player string) [8][8]string {
 	fmt.Println("Moved bishop!")
-	return nil
+	var emptyBoard [8][8]string
+	emptyBoard[0][0] = "E"
+	return emptyBoard
 }
 
 func moveQueen(board map[int]string, row int, col int, player string) map[int]string {
@@ -207,46 +208,85 @@ func genWhite(board [8][8]string) *Tree {
 						moves.Children = append(moves.Children, newBranch)
 					}
 				}
-				/*
-					case "wR":
-						rookMove := moveRook(board, row, col, "w")
-						if rookMove != nil {
-							moves.Children = append(moves.Children, rookMove)
-						}
-				*/
+			case "wR":
+				var rookMoves [][8][8]string
+				// vertical down moves
+				for vertDown := col; vertDown < 8; vertDown++ {
+					rookMove := moveRook(board, row, col, row, vertDown, "b")
+					// rooks can only move as far as the first piece they encounter
+					if rookMove[0][0] == "E" {
+						break
+					} else {
+						rookMoves = append(rookMoves, rookMove)
+					}
+				}
+				// vertical up moves
+				for vertUp := col; vertUp >= 0; vertUp-- {
+					rookMove := moveRook(board, row, col, row, vertUp, "b")
+					if rookMove[0][0] == "E" {
+						break
+					} else {
+						rookMoves = append(rookMoves, rookMove)
+					}
+				}
+				// horizontal right moves
+				for horzRight := row; horzRight < 8; horzRight++ {
+					rookMove := moveRook(board, row, col, horzRight, col, "b")
+					if rookMove[0][0] == "E" {
+						break
+					} else {
+						rookMoves = append(rookMoves, rookMove)
+					}
+				}
+				// horizontal left moves
+				for horzLeft := row; horzLeft >= 0; horzLeft-- {
+					rookMove := moveRook(board, row, col, horzLeft, col, "b")
+					if rookMove[0][0] == "E" {
+						break
+					} else {
+						rookMoves = append(rookMoves, rookMove)
+					}
+				}
+				for _, move := range rookMoves {
+					if move[0][0] != "E" {
+						newBranch := new(Tree)
+						newBranch.Board = move
+						moves.Children = append(moves.Children, newBranch)
+					}
+				}
 			case "wKn":
 				var knightMoves [][8][8]string
-				knightMoveVMaUR := moveKnight(board, row, col, "vertMajorUp", "right", "w", "b")
+				knightMoveVMaUR := moveKnight(board, row, col, "vertMajorUp", "right", "b")
 				knightMoves = append(knightMoves, knightMoveVMaUR)
-				knightMoveVMaUL := moveKnight(board, row, col, "vertMajorUp", "left", "w", "b")
+				knightMoveVMaUL := moveKnight(board, row, col, "vertMajorUp", "left", "b")
 				knightMoves = append(knightMoves, knightMoveVMaUL)
-				knightMoveVMaDR := moveKnight(board, row, col, "vertMajorDown", "right", "w", "b")
+				knightMoveVMaDR := moveKnight(board, row, col, "vertMajorDown", "right", "b")
 				knightMoves = append(knightMoves, knightMoveVMaDR)
-				knightMoveVMaDL := moveKnight(board, row, col, "vertMajorDown", "left", "w", "b")
+				knightMoveVMaDL := moveKnight(board, row, col, "vertMajorDown", "left", "b")
 				knightMoves = append(knightMoves, knightMoveVMaDL)
-				knightMoveMiUR := moveKnight(board, row, col, "vertMinorUp", "right", "w", "b")
+				knightMoveMiUR := moveKnight(board, row, col, "vertMinorUp", "right", "b")
 				knightMoves = append(knightMoves, knightMoveMiUR)
-				knightMoveVMiUL := moveKnight(board, row, col, "vertMinorUp", "left", "w", "b")
+				knightMoveVMiUL := moveKnight(board, row, col, "vertMinorUp", "left", "b")
 				knightMoves = append(knightMoves, knightMoveVMiUL)
-				knightMoveVMiDR := moveKnight(board, row, col, "vertMinorDown", "right", "w", "b")
+				knightMoveVMiDR := moveKnight(board, row, col, "vertMinorDown", "right", "b")
 				knightMoves = append(knightMoves, knightMoveVMiDR)
-				knightMoveVMiDL := moveKnight(board, row, col, "vertMinorDown", "left", "w", "b")
+				knightMoveVMiDL := moveKnight(board, row, col, "vertMinorDown", "left", "b")
 				knightMoves = append(knightMoves, knightMoveVMiDL)
-				knightMoveHMaUR := moveKnight(board, row, col, "horzMajorUp", "right", "w", "b")
+				knightMoveHMaUR := moveKnight(board, row, col, "horzMajorUp", "right", "b")
 				knightMoves = append(knightMoves, knightMoveHMaUR)
-				knightMoveHMaUL := moveKnight(board, row, col, "horzMajorUp", "left", "w", "b")
+				knightMoveHMaUL := moveKnight(board, row, col, "horzMajorUp", "left", "b")
 				knightMoves = append(knightMoves, knightMoveHMaUL)
-				knightMoveHMaDR := moveKnight(board, row, col, "horzMajorDown", "right", "w", "b")
+				knightMoveHMaDR := moveKnight(board, row, col, "horzMajorDown", "right", "b")
 				knightMoves = append(knightMoves, knightMoveHMaDR)
-				knightMoveHMaDL := moveKnight(board, row, col, "horzMajorDown", "left", "w", "b")
+				knightMoveHMaDL := moveKnight(board, row, col, "horzMajorDown", "left", "b")
 				knightMoves = append(knightMoves, knightMoveHMaDL)
-				knightMoveHMiUR := moveKnight(board, row, col, "horzMinorUp", "right", "w", "b")
+				knightMoveHMiUR := moveKnight(board, row, col, "horzMinorUp", "right", "b")
 				knightMoves = append(knightMoves, knightMoveHMiUR)
-				knightMoveHMiUL := moveKnight(board, row, col, "horzMinorUp", "left", "w", "b")
+				knightMoveHMiUL := moveKnight(board, row, col, "horzMinorUp", "left", "b")
 				knightMoves = append(knightMoves, knightMoveHMiUL)
-				knightMoveHMiDR := moveKnight(board, row, col, "horzMinorDown", "right", "w", "b")
+				knightMoveHMiDR := moveKnight(board, row, col, "horzMinorDown", "right", "b")
 				knightMoves = append(knightMoves, knightMoveHMiDR)
-				knightMoveHMiDL := moveKnight(board, row, col, "horzMinorDown", "left", "w", "b")
+				knightMoveHMiDL := moveKnight(board, row, col, "horzMinorDown", "left", "b")
 				knightMoves = append(knightMoves, knightMoveHMiDL)
 				for _, move := range knightMoves {
 					if move[0][0] != "E" {
