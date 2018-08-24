@@ -216,6 +216,11 @@ func genWhite(board [8][8]string) *Tree {
 					// rooks can only move as far as the first piece they encounter
 					if rookMove[0][0] == "E" {
 						break
+					} else if string(board[row][vertDown][0]) == "b" {
+						// if a rook encounters an enemy, it won't be invalid,
+						// but we don't want the rook to move beyond it
+						rookMoves = append(rookMoves, rookMove)
+						break
 					} else {
 						rookMoves = append(rookMoves, rookMove)
 					}
@@ -224,6 +229,9 @@ func genWhite(board [8][8]string) *Tree {
 				for vertUp := col; vertUp >= 0; vertUp-- {
 					rookMove := moveRook(board, row, col, row, vertUp, "b")
 					if rookMove[0][0] == "E" {
+						break
+					} else if string(board[row][vertUp][0]) == "b" {
+						rookMoves = append(rookMoves, rookMove)
 						break
 					} else {
 						rookMoves = append(rookMoves, rookMove)
@@ -234,6 +242,9 @@ func genWhite(board [8][8]string) *Tree {
 					rookMove := moveRook(board, row, col, horzRight, col, "b")
 					if rookMove[0][0] == "E" {
 						break
+					} else if string(board[horzRight][col][0]) == "b" {
+						rookMoves = append(rookMoves, rookMove)
+						break
 					} else {
 						rookMoves = append(rookMoves, rookMove)
 					}
@@ -242,6 +253,9 @@ func genWhite(board [8][8]string) *Tree {
 				for horzLeft := row; horzLeft >= 0; horzLeft-- {
 					rookMove := moveRook(board, row, col, horzLeft, col, "b")
 					if rookMove[0][0] == "E" {
+						break
+					} else if string(board[horzLeft][col][0]) == "b" {
+						rookMoves = append(rookMoves, rookMove)
 						break
 					} else {
 						rookMoves = append(rookMoves, rookMove)
