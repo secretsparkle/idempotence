@@ -247,20 +247,13 @@ func genBishopMoves(board [8][8]string, row int, col int, enemy string) [][8][8]
 	return bishopMoves
 }
 
-func isCheck(board [8][8]string, kingMoveRow int, kingMoveCol int, enemy string) bool {
-	if enemy == "b" {
-		blackMoveBoards := genMoves(board, "w", enemy)
-		for _, moveBoard := range blackMoveBoards.Children {
-			if string(moveBoard.Board[kingMoveRow][kingMoveCol][0]) == "b" {
-				return true
-			}
-		}
-	} else if enemy == "w" {
-		whiteMoveBoards := genMoves(board, "b", enemy)
-		for _, moveBoard := range whiteMoveBoards.Children {
-			if string(moveBoard.Board[kingMoveRow][kingMoveCol][0]) == "w" {
-				return true
-			}
+func isCheck(board [8][8]string, kingMoveRow int, kingMoveCol int, player string, enemy string) bool {
+	fmt.Println("CURRENT-BOARD: ")
+	printBoard(board)
+	moveBoards := genMoves(board, enemy, player)
+	for _, moveBoard := range moveBoards.Children {
+		if string(moveBoard.Board[kingMoveRow][kingMoveCol][0]) == enemy {
+			return true
 		}
 	}
 	return false
@@ -269,46 +262,46 @@ func isCheck(board [8][8]string, kingMoveRow int, kingMoveCol int, enemy string)
 // this function is far from finished. Each move must be checked to see if it
 // puts the king in check. This may involve calling genWhite/genBlack to see if
 // any of those moves takes the player's king.
-func genKingMoves(board [8][8]string, row int, col int, enemy string) [][8][8]string {
+func genKingMoves(board [8][8]string, row int, col int, player string, enemy string) [][8][8]string {
 	var kingMoves [][8][8]string
 	// up
 	kingMove := move(board, row, col, row-1, col, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row-1, col, enemy) {
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row-1, col, player, enemy) {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// up-diagonal-right
 	kingMove = move(board, row, col, row-1, col+1, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row-1, col+1, enemy) {
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row-1, col+1, player, enemy) {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// right
 	kingMove = move(board, row, col, row, col+1, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row, col+1, enemy) {
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row, col+1, player, enemy) {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// down-diagonal-right
 	kingMove = move(board, row, col, row+1, col+1, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row+1, col+1, enemy) {
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row+1, col+1, player, enemy) {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// down
 	kingMove = move(board, row, col, row+1, col, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row+1, col, enemy) {
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row+1, col, player, enemy) {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// down-diagonal-left
 	kingMove = move(board, row, col, row+1, col-1, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row+1, col-1, enemy) {
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row+1, col-1, player, enemy) {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// left
 	kingMove = move(board, row, col, row, col-1, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row, col-1, enemy) {
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row, col-1, player, enemy) {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// up-diagonal-left
 	kingMove = move(board, row, col, row-1, col-1, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row-1, col-1, enemy) {
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row-1, col-1, player, enemy) {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	return kingMoves
@@ -363,7 +356,7 @@ func genMoves(board [8][8]string, player string, enemy string) *Tree {
 				genNewBranches(queenStraightMoves, moves)
 				// Kings
 			case string(board[row][col][0]) == player && string(board[row][col][1]) == "K":
-				kingMoves := genKingMoves(board, row, col, enemy)
+				kingMoves := genKingMoves(board, row, col, player, enemy)
 				genNewBranches(kingMoves, moves)
 			}
 		}
