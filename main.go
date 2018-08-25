@@ -248,8 +248,6 @@ func genBishopMoves(board [8][8]string, row int, col int, enemy string) [][8][8]
 }
 
 func isCheck(board [8][8]string, kingMoveRow int, kingMoveCol int, player string, enemy string) bool {
-	fmt.Println("CURRENT-BOARD: ")
-	printBoard(board)
 	moveBoards := genMoves(board, enemy, player)
 	for _, moveBoard := range moveBoards.Children {
 		if string(moveBoard.Board[kingMoveRow][kingMoveCol][0]) == enemy {
