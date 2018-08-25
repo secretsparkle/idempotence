@@ -19,6 +19,7 @@ func main() {
 	printBoard(game.Board)
 	for _, possibilities := range game.Children {
 		printBoard(possibilities.Board)
+		fmt.Println()
 	}
 }
 
@@ -98,15 +99,11 @@ func movePawn(board [8][8]string, row int, col int, player string, moveType stri
 	return emptyBoard
 }
 
-func moveRook(board [8][8]string, row int, col int, newRow int, newCol int, enemy string) [8][8]string {
-	return move(board, row, col, newRow, newCol, enemy)
-}
-
 func genRookMoves(board [8][8]string, row int, col int, enemy string) [][8][8]string {
 	var rookMoves [][8][8]string
 	// vertical down moves
 	for vertDown := col + 1; vertDown < 8; vertDown++ {
-		rookMove := moveRook(board, row, col, row, vertDown, enemy)
+		rookMove := move(board, row, col, row, vertDown, enemy)
 		// rooks can only move as far as the first piece they encounter
 		if rookMove[0][0] == "E" {
 			break
@@ -121,7 +118,7 @@ func genRookMoves(board [8][8]string, row int, col int, enemy string) [][8][8]st
 	}
 	// vertical up moves
 	for vertUp := col - 1; vertUp >= 0; vertUp-- {
-		rookMove := moveRook(board, row, col, row, vertUp, enemy)
+		rookMove := move(board, row, col, row, vertUp, enemy)
 		if rookMove[0][0] == "E" {
 			break
 		} else if string(board[row][vertUp][0]) == enemy {
@@ -133,7 +130,7 @@ func genRookMoves(board [8][8]string, row int, col int, enemy string) [][8][8]st
 	}
 	// horizontal right moves
 	for horzRight := row + 1; horzRight < 8; horzRight++ {
-		rookMove := moveRook(board, row, col, horzRight, col, enemy)
+		rookMove := move(board, row, col, horzRight, col, enemy)
 		if rookMove[0][0] == "E" {
 			break
 		} else if string(board[horzRight][col][0]) == enemy {
@@ -145,7 +142,7 @@ func genRookMoves(board [8][8]string, row int, col int, enemy string) [][8][8]st
 	}
 	// horizontal left moves
 	for horzLeft := row - 1; horzLeft >= 0; horzLeft-- {
-		rookMove := moveRook(board, row, col, horzLeft, col, enemy)
+		rookMove := move(board, row, col, horzLeft, col, enemy)
 		if rookMove[0][0] == "E" {
 			break
 		} else if string(board[horzLeft][col][0]) == enemy {
@@ -170,68 +167,41 @@ func move(board [8][8]string, row int, col int, newRow int, newCol int, enemy st
 	}
 }
 
-// need to specifiy which move we want the knight to make as a parameter?
-func moveKnight(board [8][8]string, row int, col int, main string, direction string, enemy string) [8][8]string {
-	// main = vert horz
-	// direction = right left up down
-	vertMajorUp := row + 2
-	vertMajorDown := row - 2
-	vertMinorUp := row + 1
-	vertMinorDown := row - 1
+func genKnightMoves(board [8][8]string, row int, col int, enemy string) [][8][8]string {
+	var knightMoves [][8][8]string
+	vertMajorUp := row - 2
+	vertMajorDown := row + 2
+	vertMinorUp := row - 1
+	vertMinorDown := row + 1
 
 	horzMajorRight := col + 2
 	horzMajorLeft := col - 2
 	horzMinorRight := col + 1
 	horzMinorLeft := col - 1
-	// create empty board in case checks fail
-	var emptyBoard [8][8]string
-	emptyBoard[0][0] = "E"
-	switch {
-	case main == "vertMajorUp" && direction == "right":
-		return move(board, row, col, vertMajorUp, horzMinorRight, enemy) // 1
-	case main == "vertMajorUp" && direction == "left":
-		return move(board, row, col, vertMajorUp, horzMinorLeft, enemy) // 2
-	case main == "vertMajorDown" && direction == "right":
-		return move(board, row, col, vertMajorDown, horzMinorRight, enemy) // 3
-	case main == "vertMajorDown" && direction == "left":
-		return move(board, row, col, vertMajorDown, horzMinorLeft, enemy) // 4
-	case main == "vertMinorUp" && direction == "right":
-		return move(board, row, col, vertMinorUp, horzMajorRight, enemy) // 5
-	case main == "vertMinorUp" && direction == "left":
-		return move(board, row, col, vertMinorUp, horzMajorLeft, enemy) // 6
-	case main == "vertMinorDown" && direction == "right":
-		return move(board, row, col, vertMinorDown, horzMajorRight, enemy) // 7
-	case main == "vertMinorDown" && direction == "left":
-		return move(board, row, col, vertMinorDown, horzMajorLeft, enemy) // 8
-	case main == "horzMajorRight" && direction == "up":
-		return move(board, row, col, horzMajorRight, vertMinorUp, enemy) // 9
-	case main == "horzMajorRight" && direction == "down":
-		return move(board, row, col, horzMajorRight, vertMinorDown, enemy) // 10
-	case main == "horzMajorLeft" && direction == "up":
-		return move(board, row, col, horzMajorLeft, vertMinorUp, enemy) // 11
-	case main == "horzMajorLeft" && direction == "down":
-		return move(board, row, col, horzMajorLeft, vertMinorDown, enemy) // 12
-	case main == "horzMinorRight" && direction == "up":
-		return move(board, row, col, horzMinorRight, vertMajorUp, enemy) // 13
-	case main == "horzMinorRight" && direction == "down":
-		return move(board, row, col, horzMinorRight, vertMajorDown, enemy) // 14
-	case main == "horzMinorLeft" && direction == "up":
-		return move(board, row, col, horzMinorLeft, vertMajorUp, enemy) // 15
-	case main == "horzMinorLeft" && direction == "down":
-		return move(board, row, col, horzMinorLeft, vertMajorDown, enemy) // 16
-	default:
-		return emptyBoard
-	}
-}
 
-func moveBishop(board [8][8]string, row int, col int, newRow int, newCol int, enemy string) [8][8]string {
-	return move(board, row, col, newRow, newCol, enemy)
+	knightMove := move(board, row, col, vertMajorUp, horzMinorRight, enemy) // 1
+	knightMoves = append(knightMoves, knightMove)
+	knightMove = move(board, row, col, vertMajorUp, horzMinorLeft, enemy) // 2
+	knightMoves = append(knightMoves, knightMove)
+	knightMove = move(board, row, col, vertMajorDown, horzMinorRight, enemy) // 3
+	knightMoves = append(knightMoves, knightMove)
+	knightMove = move(board, row, col, vertMajorDown, horzMinorLeft, enemy) // 4
+	knightMoves = append(knightMoves, knightMove)
+	knightMove = move(board, row, col, vertMinorUp, horzMajorRight, enemy) // 5
+	knightMoves = append(knightMoves, knightMove)
+	knightMove = move(board, row, col, vertMinorUp, horzMajorLeft, enemy) // 6
+	knightMoves = append(knightMoves, knightMove)
+	knightMove = move(board, row, col, vertMinorDown, horzMajorRight, enemy) // 7
+	knightMoves = append(knightMoves, knightMove)
+	knightMove = move(board, row, col, vertMinorDown, horzMajorLeft, enemy) // 8
+	knightMoves = append(knightMoves, knightMove)
+	return knightMoves
 }
 
 func genBishopMoves(board [8][8]string, row int, col int, enemy string) [][8][8]string {
 	var bishopMoves [][8][8]string
 	for vertUpRow, horzRightCol := row-1, col+1; vertUpRow >= 0 && horzRightCol < 8; vertUpRow, horzRightCol = vertUpRow-1, horzRightCol+1 {
-		bishopMove := moveBishop(board, row, col, vertUpRow, horzRightCol, enemy)
+		bishopMove := move(board, row, col, vertUpRow, horzRightCol, enemy)
 		// bishops can only move as far as the first piece they encounter
 		if bishopMove[0][0] == "E" {
 			break
@@ -245,7 +215,7 @@ func genBishopMoves(board [8][8]string, row int, col int, enemy string) [][8][8]
 		}
 	}
 	for vertDownRow, horzRightCol := row+1, col+1; vertDownRow < 8 && horzRightCol < 8; vertDownRow, horzRightCol = vertDownRow+1, horzRightCol+1 {
-		bishopMove := moveBishop(board, row, col, vertDownRow, horzRightCol, enemy)
+		bishopMove := move(board, row, col, vertDownRow, horzRightCol, enemy)
 		if bishopMove[0][0] == "E" {
 			break
 		} else if string(board[vertDownRow][horzRightCol][0]) == enemy {
@@ -256,7 +226,7 @@ func genBishopMoves(board [8][8]string, row int, col int, enemy string) [][8][8]
 		}
 	}
 	for vertDownRow, horzLeftCol := row+1, col-1; vertDownRow < 8 && horzLeftCol >= 0; vertDownRow, horzLeftCol = vertDownRow+1, horzLeftCol-1 {
-		bishopMove := moveBishop(board, row, col, vertDownRow, horzLeftCol, enemy)
+		bishopMove := move(board, row, col, vertDownRow, horzLeftCol, enemy)
 		if bishopMove[0][0] == "E" {
 			break
 		} else if string(board[vertDownRow][horzLeftCol][0]) == enemy {
@@ -267,7 +237,7 @@ func genBishopMoves(board [8][8]string, row int, col int, enemy string) [][8][8]
 		}
 	}
 	for vertUpRow, horzLeftCol := row-1, col-1; vertUpRow >= 0 && horzLeftCol >= 0; vertUpRow, horzLeftCol = vertUpRow-1, horzLeftCol-1 {
-		bishopMove := moveBishop(board, row, col, vertUpRow, horzLeftCol, enemy)
+		bishopMove := move(board, row, col, vertUpRow, horzLeftCol, enemy)
 		if bishopMove[0][0] == "E" {
 			break
 		} else if string(board[vertUpRow][horzLeftCol][0]) == enemy {
@@ -290,6 +260,16 @@ func moveKing(board map[int]string, row int, col int, player string) map[int]str
 	return nil
 }
 
+func genNewBranches(pieceMoves [][8][8]string, moves *Tree) {
+	for _, move := range pieceMoves {
+		if move[0][0] != "E" {
+			newBranch := new(Tree)
+			newBranch.Board = move
+			moves.Children = append(moves.Children, newBranch)
+		}
+	}
+}
+
 // secondary move generation driver specific to white
 func genWhite(board [8][8]string) *Tree {
 	moves := new(Tree)
@@ -306,86 +286,29 @@ func genWhite(board [8][8]string) *Tree {
 				pawnMoves = append(pawnMoves, pawnMoveLeftAttack)
 				pawnMoveRightAttack := movePawn(board, row, col, "w", "rightAttack")
 				pawnMoves = append(pawnMoves, pawnMoveRightAttack)
-				for _, move := range pawnMoves {
-					if move[0][0] != "E" {
-						newBranch := new(Tree)
-						newBranch.Board = move
-						moves.Children = append(moves.Children, newBranch)
-					}
-				}
-			case "wR":
-				rookMoves := genRookMoves(board, row, col, "b")
-				// this portion can be abstracted into its own function
-				for _, move := range rookMoves {
-					if move[0][0] != "E" {
-						newBranch := new(Tree)
-						newBranch.Board = move
-						moves.Children = append(moves.Children, newBranch)
-					}
-				}
+				genNewBranches(pawnMoves, moves)
 			case "wKn":
-				var knightMoves [][8][8]string
-				knightMoveVMaUR := moveKnight(board, row, col, "vertMajorUp", "right", "b")
-				knightMoves = append(knightMoves, knightMoveVMaUR)
-				knightMoveVMaUL := moveKnight(board, row, col, "vertMajorUp", "left", "b")
-				knightMoves = append(knightMoves, knightMoveVMaUL)
-				knightMoveVMaDR := moveKnight(board, row, col, "vertMajorDown", "right", "b")
-				knightMoves = append(knightMoves, knightMoveVMaDR)
-				knightMoveVMaDL := moveKnight(board, row, col, "vertMajorDown", "left", "b")
-				knightMoves = append(knightMoves, knightMoveVMaDL)
-				knightMoveMiUR := moveKnight(board, row, col, "vertMinorUp", "right", "b")
-				knightMoves = append(knightMoves, knightMoveMiUR)
-				knightMoveVMiUL := moveKnight(board, row, col, "vertMinorUp", "left", "b")
-				knightMoves = append(knightMoves, knightMoveVMiUL)
-				knightMoveVMiDR := moveKnight(board, row, col, "vertMinorDown", "right", "b")
-				knightMoves = append(knightMoves, knightMoveVMiDR)
-				knightMoveVMiDL := moveKnight(board, row, col, "vertMinorDown", "left", "b")
-				knightMoves = append(knightMoves, knightMoveVMiDL)
-				knightMoveHMaUR := moveKnight(board, row, col, "horzMajorUp", "right", "b")
-				knightMoves = append(knightMoves, knightMoveHMaUR)
-				knightMoveHMaUL := moveKnight(board, row, col, "horzMajorUp", "left", "b")
-				knightMoves = append(knightMoves, knightMoveHMaUL)
-				knightMoveHMaDR := moveKnight(board, row, col, "horzMajorDown", "right", "b")
-				knightMoves = append(knightMoves, knightMoveHMaDR)
-				knightMoveHMaDL := moveKnight(board, row, col, "horzMajorDown", "left", "b")
-				knightMoves = append(knightMoves, knightMoveHMaDL)
-				knightMoveHMiUR := moveKnight(board, row, col, "horzMinorUp", "right", "b")
-				knightMoves = append(knightMoves, knightMoveHMiUR)
-				knightMoveHMiUL := moveKnight(board, row, col, "horzMinorUp", "left", "b")
-				knightMoves = append(knightMoves, knightMoveHMiUL)
-				knightMoveHMiDR := moveKnight(board, row, col, "horzMinorDown", "right", "b")
-				knightMoves = append(knightMoves, knightMoveHMiDR)
-				knightMoveHMiDL := moveKnight(board, row, col, "horzMinorDown", "left", "b")
-				knightMoves = append(knightMoves, knightMoveHMiDL)
-				for _, move := range knightMoves {
-					if move[0][0] != "E" {
-						newBranch := new(Tree)
-						newBranch.Board = move
-						moves.Children = append(moves.Children, newBranch)
-					}
-				}
+				knightMoves := genKnightMoves(board, row, col, "b")
+				genNewBranches(knightMoves, moves)
 			case "wB":
 				bishopMoves := genBishopMoves(board, row, col, "b")
-				for _, move := range bishopMoves {
-					if move[0][0] != "E" {
-						newBranch := new(Tree)
-						newBranch.Board = move
-						moves.Children = append(moves.Children, newBranch)
-					}
-				}
+				genNewBranches(bishopMoves, moves)
+			case "wR":
+				rookMoves := genRookMoves(board, row, col, "b")
+				genNewBranches(rookMoves, moves)
+			case "wQ":
+				// I'm proud of this part
+				queenDiagMoves := genBishopMoves(board, row, col, "b")
+				queenStraightMoves := genRookMoves(board, row, col, "b")
+				genNewBranches(queenDiagMoves, moves)
+				genNewBranches(queenStraightMoves, moves)
 				/*
-					case "wQ":
-						queenMove := moveQueen(board, row, col, "w")
-						if queenMove != nil {
-							moves.Children = append(moves.Children, queenMove)
-						}
 					case "wK":
-						kingMove := moveKing(board, row, col, "w")
-						if kingMove != nil {
-							moves.Children = append(moves.Children, kingMove)
-						}
+							kingMove := moveKing(board, row, col, "w")
+							if kingMove != nil {
+								moves.Children = append(moves.Children, kingMove)
+							}
 				*/
-
 			}
 		}
 	}
