@@ -40,8 +40,18 @@ func printBoard(board [8][8]string) {
 	}
 }
 
-// need to account for pawn moving two spaces
-// also need to account if pawn would move off the board
+func move(board [8][8]string, row int, col int, newRow int, newCol int, enemy string) [8][8]string {
+	var emptyBoard [8][8]string
+	emptyBoard[0][0] = "E"
+	if withinBoundaries(newRow, newCol) == true && (board[newRow][newCol] == "_" || string(board[newRow][newCol][0]) == enemy) {
+		board[newRow][newCol] = board[row][col]
+		board[row][col] = "_"
+		return board
+	} else {
+		return emptyBoard
+	}
+}
+
 func movePawn(board [8][8]string, row int, col int, player string, moveType string) [8][8]string {
 	newRow := -1
 	newCol := -1
@@ -155,18 +165,6 @@ func genRookMoves(board [8][8]string, row int, col int, enemy string) [][8][8]st
 	return rookMoves
 }
 
-func move(board [8][8]string, row int, col int, newRow int, newCol int, enemy string) [8][8]string {
-	var emptyBoard [8][8]string
-	emptyBoard[0][0] = "E"
-	if withinBoundaries(newRow, newCol) == true && (board[newRow][newCol] == "_" || string(board[newRow][newCol][0]) == enemy) {
-		board[newRow][newCol] = board[row][col]
-		board[row][col] = "_"
-		return board
-	} else {
-		return emptyBoard
-	}
-}
-
 func genKnightMoves(board [8][8]string, row int, col int, enemy string) [][8][8]string {
 	var knightMoves [][8][8]string
 	vertMajorUp := row - 2
@@ -250,14 +248,36 @@ func genBishopMoves(board [8][8]string, row int, col int, enemy string) [][8][8]
 	return bishopMoves
 }
 
-func moveQueen(board map[int]string, row int, col int, player string) map[int]string {
-	fmt.Println("Moved queen!")
-	return nil
-}
-
-func moveKing(board map[int]string, row int, col int, player string) map[int]string {
-	fmt.Println("Moved king!")
-	return nil
+// this function is far from finished. Each move must be checked to see if it
+// puts the king in check. This may involve calling genWhite/genBlack to see if
+// any of those moves takes the player's king.
+func genKingMoves(board [8][8]string, row int, col int, enemy string) [][8][8]string {
+	var kingMoves [][8][8]string
+	// up
+	kingMove := move(board, row, col, row-1, col, enemy)
+	kingMoves = append(kingMoves, kingMove)
+	// up-diagonal-right
+	kingMove = move(board, row, col, row-1, col+1, enemy)
+	kingMoves = append(kingMoves, kingMove)
+	// right
+	kingMove = move(board, row, col, row, col+1, enemy)
+	kingMoves = append(kingMoves, kingMove)
+	// down-diagonal-right
+	kingMove = move(board, row, col, row+1, col+1, enemy)
+	kingMoves = append(kingMoves, kingMove)
+	// down
+	kingMove = move(board, row, col, row+1, col, enemy)
+	kingMoves = append(kingMoves, kingMove)
+	// down-diagonal-left
+	kingMove = move(board, row, col, row+1, col-1, enemy)
+	kingMoves = append(kingMoves, kingMove)
+	// left
+	kingMove = move(board, row, col, row, col-1, enemy)
+	kingMoves = append(kingMoves, kingMove)
+	// up-diagonal-left
+	kingMove = move(board, row, col, row-1, col-1, enemy)
+	kingMoves = append(kingMoves, kingMove)
+	return kingMoves
 }
 
 func genNewBranches(pieceMoves [][8][8]string, moves *Tree) {
@@ -302,13 +322,9 @@ func genWhite(board [8][8]string) *Tree {
 				queenStraightMoves := genRookMoves(board, row, col, "b")
 				genNewBranches(queenDiagMoves, moves)
 				genNewBranches(queenStraightMoves, moves)
-				/*
-					case "wK":
-							kingMove := moveKing(board, row, col, "w")
-							if kingMove != nil {
-								moves.Children = append(moves.Children, kingMove)
-							}
-				*/
+			case "wK":
+				kingMoves := genKingMoves(board, row, col, "b")
+				genNewBranches(kingMoves, moves)
 			}
 		}
 	}
