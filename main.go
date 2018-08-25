@@ -102,6 +102,62 @@ func moveRook(board [8][8]string, row int, col int, newRow int, newCol int, enem
 	return move(board, row, col, newRow, newCol, enemy)
 }
 
+func genRookMoves(board [8][8]string, row int, col int, enemy string) [][8][8]string {
+	var rookMoves [][8][8]string
+	// vertical down moves
+	for vertDown := col + 1; vertDown < 8; vertDown++ {
+		rookMove := moveRook(board, row, col, row, vertDown, enemy)
+		// rooks can only move as far as the first piece they encounter
+		if rookMove[0][0] == "E" {
+			break
+		} else if string(board[row][vertDown][0]) == enemy {
+			// if a rook encounters an enemy, it won't be invalid,
+			// but we don't want the rook to move beyond it
+			rookMoves = append(rookMoves, rookMove)
+			break
+		} else {
+			rookMoves = append(rookMoves, rookMove)
+		}
+	}
+	// vertical up moves
+	for vertUp := col - 1; vertUp >= 0; vertUp-- {
+		rookMove := moveRook(board, row, col, row, vertUp, enemy)
+		if rookMove[0][0] == "E" {
+			break
+		} else if string(board[row][vertUp][0]) == enemy {
+			rookMoves = append(rookMoves, rookMove)
+			break
+		} else {
+			rookMoves = append(rookMoves, rookMove)
+		}
+	}
+	// horizontal right moves
+	for horzRight := row + 1; horzRight < 8; horzRight++ {
+		rookMove := moveRook(board, row, col, horzRight, col, enemy)
+		if rookMove[0][0] == "E" {
+			break
+		} else if string(board[horzRight][col][0]) == enemy {
+			rookMoves = append(rookMoves, rookMove)
+			break
+		} else {
+			rookMoves = append(rookMoves, rookMove)
+		}
+	}
+	// horizontal left moves
+	for horzLeft := row - 1; horzLeft >= 0; horzLeft-- {
+		rookMove := moveRook(board, row, col, horzLeft, col, enemy)
+		if rookMove[0][0] == "E" {
+			break
+		} else if string(board[horzLeft][col][0]) == enemy {
+			rookMoves = append(rookMoves, rookMove)
+			break
+		} else {
+			rookMoves = append(rookMoves, rookMove)
+		}
+	}
+	return rookMoves
+}
+
 func move(board [8][8]string, row int, col int, newRow int, newCol int, enemy string) [8][8]string {
 	var emptyBoard [8][8]string
 	emptyBoard[0][0] = "E"
@@ -168,11 +224,60 @@ func moveKnight(board [8][8]string, row int, col int, main string, direction str
 	}
 }
 
-func moveBishop(board map[int]string, row int, col int, player string) [8][8]string {
-	fmt.Println("Moved bishop!")
-	var emptyBoard [8][8]string
-	emptyBoard[0][0] = "E"
-	return emptyBoard
+func moveBishop(board [8][8]string, row int, col int, newRow int, newCol int, enemy string) [8][8]string {
+	return move(board, row, col, newRow, newCol, enemy)
+}
+
+func genBishopMoves(board [8][8]string, row int, col int, enemy string) [][8][8]string {
+	var bishopMoves [][8][8]string
+	for vertUpRow, horzRightCol := row-1, col+1; vertUpRow >= 0 && horzRightCol < 8; vertUpRow, horzRightCol = vertUpRow-1, horzRightCol+1 {
+		bishopMove := moveBishop(board, row, col, vertUpRow, horzRightCol, enemy)
+		// bishops can only move as far as the first piece they encounter
+		if bishopMove[0][0] == "E" {
+			break
+		} else if string(board[vertUpRow][horzRightCol][0]) == enemy {
+			// if a bishop encounters an enemy, it won't be invalid,
+			// but we don't want the rook to move beyond it
+			bishopMoves = append(bishopMoves, bishopMove)
+			break
+		} else {
+			bishopMoves = append(bishopMoves, bishopMove)
+		}
+	}
+	for vertDownRow, horzRightCol := row+1, col+1; vertDownRow < 8 && horzRightCol < 8; vertDownRow, horzRightCol = vertDownRow+1, horzRightCol+1 {
+		bishopMove := moveBishop(board, row, col, vertDownRow, horzRightCol, enemy)
+		if bishopMove[0][0] == "E" {
+			break
+		} else if string(board[vertDownRow][horzRightCol][0]) == enemy {
+			bishopMoves = append(bishopMoves, bishopMove)
+			break
+		} else {
+			bishopMoves = append(bishopMoves, bishopMove)
+		}
+	}
+	for vertDownRow, horzLeftCol := row+1, col-1; vertDownRow < 8 && horzLeftCol >= 0; vertDownRow, horzLeftCol = vertDownRow+1, horzLeftCol-1 {
+		bishopMove := moveBishop(board, row, col, vertDownRow, horzLeftCol, enemy)
+		if bishopMove[0][0] == "E" {
+			break
+		} else if string(board[vertDownRow][horzLeftCol][0]) == enemy {
+			bishopMoves = append(bishopMoves, bishopMove)
+			break
+		} else {
+			bishopMoves = append(bishopMoves, bishopMove)
+		}
+	}
+	for vertUpRow, horzLeftCol := row-1, col-1; vertUpRow >= 0 && horzLeftCol >= 0; vertUpRow, horzLeftCol = vertUpRow-1, horzLeftCol-1 {
+		bishopMove := moveBishop(board, row, col, vertUpRow, horzLeftCol, enemy)
+		if bishopMove[0][0] == "E" {
+			break
+		} else if string(board[vertUpRow][horzLeftCol][0]) == enemy {
+			bishopMoves = append(bishopMoves, bishopMove)
+			break
+		} else {
+			bishopMoves = append(bishopMoves, bishopMove)
+		}
+	}
+	return bishopMoves
 }
 
 func moveQueen(board map[int]string, row int, col int, player string) map[int]string {
@@ -209,58 +314,8 @@ func genWhite(board [8][8]string) *Tree {
 					}
 				}
 			case "wR":
-				var rookMoves [][8][8]string
-				// vertical down moves
-				for vertDown := col; vertDown < 8; vertDown++ {
-					rookMove := moveRook(board, row, col, row, vertDown, "b")
-					// rooks can only move as far as the first piece they encounter
-					if rookMove[0][0] == "E" {
-						break
-					} else if string(board[row][vertDown][0]) == "b" {
-						// if a rook encounters an enemy, it won't be invalid,
-						// but we don't want the rook to move beyond it
-						rookMoves = append(rookMoves, rookMove)
-						break
-					} else {
-						rookMoves = append(rookMoves, rookMove)
-					}
-				}
-				// vertical up moves
-				for vertUp := col; vertUp >= 0; vertUp-- {
-					rookMove := moveRook(board, row, col, row, vertUp, "b")
-					if rookMove[0][0] == "E" {
-						break
-					} else if string(board[row][vertUp][0]) == "b" {
-						rookMoves = append(rookMoves, rookMove)
-						break
-					} else {
-						rookMoves = append(rookMoves, rookMove)
-					}
-				}
-				// horizontal right moves
-				for horzRight := row; horzRight < 8; horzRight++ {
-					rookMove := moveRook(board, row, col, horzRight, col, "b")
-					if rookMove[0][0] == "E" {
-						break
-					} else if string(board[horzRight][col][0]) == "b" {
-						rookMoves = append(rookMoves, rookMove)
-						break
-					} else {
-						rookMoves = append(rookMoves, rookMove)
-					}
-				}
-				// horizontal left moves
-				for horzLeft := row; horzLeft >= 0; horzLeft-- {
-					rookMove := moveRook(board, row, col, horzLeft, col, "b")
-					if rookMove[0][0] == "E" {
-						break
-					} else if string(board[horzLeft][col][0]) == "b" {
-						rookMoves = append(rookMoves, rookMove)
-						break
-					} else {
-						rookMoves = append(rookMoves, rookMove)
-					}
-				}
+				rookMoves := genRookMoves(board, row, col, "b")
+				// this portion can be abstracted into its own function
 				for _, move := range rookMoves {
 					if move[0][0] != "E" {
 						newBranch := new(Tree)
@@ -309,12 +364,16 @@ func genWhite(board [8][8]string) *Tree {
 						moves.Children = append(moves.Children, newBranch)
 					}
 				}
+			case "wB":
+				bishopMoves := genBishopMoves(board, row, col, "b")
+				for _, move := range bishopMoves {
+					if move[0][0] != "E" {
+						newBranch := new(Tree)
+						newBranch.Board = move
+						moves.Children = append(moves.Children, newBranch)
+					}
+				}
 				/*
-					case "wB":
-						bishopMove := moveBishop(board, row, col, "w")
-						if bishopMove != nil {
-							moves.Children = append(moves.Children, bishopMove)
-						}
 					case "wQ":
 						queenMove := moveQueen(board, row, col, "w")
 						if queenMove != nil {
