@@ -15,8 +15,9 @@ type Tree struct {
 func main() {
 	game := new(Tree)
 	game.Board = buildChessBoard()
-	generateMoves(game, "w")
+	genMovesLevel(game, "w")
 	printBoard(game.Board)
+	fmt.Println()
 	for _, possibilities := range game.Children {
 		printBoard(possibilities.Board)
 		fmt.Println()
@@ -28,9 +29,7 @@ func printBoard(board [8][8]string) {
 	for _, row := range board {
 		for _, square := range row {
 			fmt.Printf(square)
-			if square == "wKn" || square == "bKn" {
-				fmt.Printf("  ")
-			} else if square == "_" {
+			if square == "_" {
 				fmt.Printf("    ")
 			} else {
 				fmt.Printf("   ")
@@ -248,6 +247,25 @@ func genBishopMoves(board [8][8]string, row int, col int, enemy string) [][8][8]
 	return bishopMoves
 }
 
+func isCheck(board [8][8]string, kingMoveRow int, kingMoveCol int, enemy string) bool {
+	if enemy == "b" {
+		blackMoveBoards := genMoves(board, "w", enemy)
+		for _, moveBoard := range blackMoveBoards.Children {
+			if string(moveBoard.Board[kingMoveRow][kingMoveCol][0]) == "b" {
+				return true
+			}
+		}
+	} else if enemy == "w" {
+		whiteMoveBoards := genMoves(board, "b", enemy)
+		for _, moveBoard := range whiteMoveBoards.Children {
+			if string(moveBoard.Board[kingMoveRow][kingMoveCol][0]) == "w" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // this function is far from finished. Each move must be checked to see if it
 // puts the king in check. This may involve calling genWhite/genBlack to see if
 // any of those moves takes the player's king.
@@ -255,28 +273,44 @@ func genKingMoves(board [8][8]string, row int, col int, enemy string) [][8][8]st
 	var kingMoves [][8][8]string
 	// up
 	kingMove := move(board, row, col, row-1, col, enemy)
-	kingMoves = append(kingMoves, kingMove)
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row-1, col, enemy) {
+		kingMoves = append(kingMoves, kingMove)
+	}
 	// up-diagonal-right
 	kingMove = move(board, row, col, row-1, col+1, enemy)
-	kingMoves = append(kingMoves, kingMove)
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row-1, col+1, enemy) {
+		kingMoves = append(kingMoves, kingMove)
+	}
 	// right
 	kingMove = move(board, row, col, row, col+1, enemy)
-	kingMoves = append(kingMoves, kingMove)
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row, col+1, enemy) {
+		kingMoves = append(kingMoves, kingMove)
+	}
 	// down-diagonal-right
 	kingMove = move(board, row, col, row+1, col+1, enemy)
-	kingMoves = append(kingMoves, kingMove)
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row+1, col+1, enemy) {
+		kingMoves = append(kingMoves, kingMove)
+	}
 	// down
 	kingMove = move(board, row, col, row+1, col, enemy)
-	kingMoves = append(kingMoves, kingMove)
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row+1, col, enemy) {
+		kingMoves = append(kingMoves, kingMove)
+	}
 	// down-diagonal-left
 	kingMove = move(board, row, col, row+1, col-1, enemy)
-	kingMoves = append(kingMoves, kingMove)
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row+1, col-1, enemy) {
+		kingMoves = append(kingMoves, kingMove)
+	}
 	// left
 	kingMove = move(board, row, col, row, col-1, enemy)
-	kingMoves = append(kingMoves, kingMove)
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row, col-1, enemy) {
+		kingMoves = append(kingMoves, kingMove)
+	}
 	// up-diagonal-left
 	kingMove = move(board, row, col, row-1, col-1, enemy)
-	kingMoves = append(kingMoves, kingMove)
+	if kingMove[0][0] != "E" && !isCheck(kingMove, row-1, col-1, enemy) {
+		kingMoves = append(kingMoves, kingMove)
+	}
 	return kingMoves
 }
 
@@ -290,40 +324,46 @@ func genNewBranches(pieceMoves [][8][8]string, moves *Tree) {
 	}
 }
 
-// secondary move generation driver specific to white
-func genWhite(board [8][8]string) *Tree {
+// abstract move generation driver
+func genMoves(board [8][8]string, player string, enemy string) *Tree {
 	moves := new(Tree)
 	for row := 0; row < 8; row++ {
 		for col := 0; col < 8; col++ {
-			switch board[row][col] {
-			case "wP":
+			switch {
+			// Pawns
+			case string(board[row][col][0]) == player && string(board[row][col][1]) == "P":
 				var pawnMoves [][8][8]string
-				pawnMoveForward := movePawn(board, row, col, "w", "forward")
+				pawnMoveForward := movePawn(board, row, col, player, "forward")
 				pawnMoves = append(pawnMoves, pawnMoveForward)
-				pawnMoveForwardTwo := movePawn(board, row, col, "w", "forwardTwo")
+				pawnMoveForwardTwo := movePawn(board, row, col, player, "forwardTwo")
 				pawnMoves = append(pawnMoves, pawnMoveForwardTwo)
-				pawnMoveLeftAttack := movePawn(board, row, col, "w", "leftAttack")
+				pawnMoveLeftAttack := movePawn(board, row, col, player, "leftAttack")
 				pawnMoves = append(pawnMoves, pawnMoveLeftAttack)
-				pawnMoveRightAttack := movePawn(board, row, col, "w", "rightAttack")
+				pawnMoveRightAttack := movePawn(board, row, col, player, "rightAttack")
 				pawnMoves = append(pawnMoves, pawnMoveRightAttack)
 				genNewBranches(pawnMoves, moves)
-			case "wKn":
-				knightMoves := genKnightMoves(board, row, col, "b")
+				// Knights
+			case string(board[row][col][0]) == player && string(board[row][col][1]) == "N":
+				knightMoves := genKnightMoves(board, row, col, enemy)
 				genNewBranches(knightMoves, moves)
-			case "wB":
-				bishopMoves := genBishopMoves(board, row, col, "b")
+				// Bishops
+			case string(board[row][col][0]) == player && string(board[row][col][1]) == "B":
+				bishopMoves := genBishopMoves(board, row, col, enemy)
 				genNewBranches(bishopMoves, moves)
-			case "wR":
-				rookMoves := genRookMoves(board, row, col, "b")
+				// Rooks
+			case string(board[row][col][0]) == player && string(board[row][col][1]) == "R":
+				rookMoves := genRookMoves(board, row, col, enemy)
 				genNewBranches(rookMoves, moves)
-			case "wQ":
+				// Queens
+			case string(board[row][col][0]) == player && string(board[row][col][1]) == "Q":
 				// I'm proud of this part
-				queenDiagMoves := genBishopMoves(board, row, col, "b")
-				queenStraightMoves := genRookMoves(board, row, col, "b")
+				queenDiagMoves := genBishopMoves(board, row, col, enemy)
+				queenStraightMoves := genRookMoves(board, row, col, enemy)
 				genNewBranches(queenDiagMoves, moves)
 				genNewBranches(queenStraightMoves, moves)
-			case "wK":
-				kingMoves := genKingMoves(board, row, col, "b")
+				// Kings
+			case string(board[row][col][0]) == player && string(board[row][col][1]) == "K":
+				kingMoves := genKingMoves(board, row, col, enemy)
 				genNewBranches(kingMoves, moves)
 			}
 		}
@@ -331,85 +371,14 @@ func genWhite(board [8][8]string) *Tree {
 	return moves
 }
 
-// secondary move generation driver specific to black
-func genBlack(board [8][8]string) *Tree {
-	moves := new(Tree)
-	for row := 0; row < 8; row++ {
-		for col := 0; col < 8; col++ {
-			switch board[row][col] {
-			case "bP":
-				pawnMove := movePawn(board, row, col, "b", "forward")
-				if pawnMove[0][0] != "E" {
-					newBranch := new(Tree)
-					newBranch.Board = pawnMove
-					moves.Children = append(moves.Children, newBranch)
-				}
-				/*
-					case "bR":
-						rookMove := moveRook(board, row, col, "b")
-						if rookMove != nil {
-							moves.Children = append(moves.Children, rookMove)
-						}
-				*/
-				/*
-					case "bKn":
-						var knightMoves [][8][8]string
-						knightMoveVUR := moveKnight(board, row, col, "vert", "up", "right", "b", "w")
-						knightMoves = append(knightMoves, knightMoveVUR)
-						knightMoveVUL := moveKnight(board, row, col, "vert", "up", "left", "b", "w")
-						knightMoves = append(knightMoves, knightMoveVUL)
-						knightMoveVDR := moveKnight(board, row, col, "vert", "down", "right", "b", "w")
-						knightMoves = append(knightMoves, knightMoveVDR)
-						knightMoveVDL := moveKnight(board, row, col, "vert", "down", "left", "b", "w")
-						knightMoves = append(knightMoves, knightMoveVDL)
-						knightMoveHUR := moveKnight(board, row, col, "horz", "up", "right", "b", "w")
-						knightMoves = append(knightMoves, knightMoveHUR)
-						knightMoveHUL := moveKnight(board, row, col, "horz", "up", "left", "b", "w")
-						knightMoves = append(knightMoves, knightMoveHUL)
-						knightMoveHDR := moveKnight(board, row, col, "horz", "down", "right", "b", "w")
-						knightMoves = append(knightMoves, knightMoveHDR)
-						knightMoveHDL := moveKnight(board, row, col, "horz", "down", "left", "b", "w")
-						knightMoves = append(knightMoves, knightMoveHDL)
-						for _, move := range knightMoves {
-							if move[0][0] != "E" {
-								newBranch := new(Tree)
-								newBranch.Board = move
-								moves.Children = append(moves.Children, newBranch)
-							}
-						}
-				*/
-				/*
-					case "bB":
-						bishopMove := moveBishop(board, row, col, "b")
-						if bishopMove != nil {
-							moves.Children = append(moves.Children, bishopMove)
-						}
-					case "bQ":
-						queenMove := moveQueen(board, row, col, "b")
-						if queenMove != nil {
-							moves.Children = append(moves.Children, queenMove)
-						}
-					case "bK":
-						kingMove := moveKing(board, row, col, "b")
-						if kingMove != nil {
-							moves.Children = append(moves.Children, kingMove)
-						}
-				*/
-
-			}
-		}
-	}
-	return moves
-}
-
-// driver to produce all available moves from a given board state
-func generateMoves(tree *Tree, player string) {
+// driver to produce all available moves, one level down, from a given board state
+func genMovesLevel(tree *Tree, player string) {
 	if player == "w" {
-		generatedBoards := genWhite(tree.Board)
+		generatedBoards := genMoves(tree.Board, player, "b")
 		tree.Children = generatedBoards.Children
 		fmt.Println("genWhite")
 	} else if player == "b" {
-		generatedBoards := genBlack(tree.Board)
+		generatedBoards := genMoves(tree.Board, player, "w")
 		tree.Children = generatedBoards.Children
 	}
 }
@@ -433,7 +402,7 @@ func buildChessBoard() [8][8]string {
 				case 0:
 					board[i][j] = "wR"
 				case 1:
-					board[i][j] = "wKn"
+					board[i][j] = "wN"
 				case 2:
 					board[i][j] = "wB"
 				case 3:
@@ -443,7 +412,7 @@ func buildChessBoard() [8][8]string {
 				case 5:
 					board[i][j] = "wB"
 				case 6:
-					board[i][j] = "wKn"
+					board[i][j] = "wN"
 				case 7:
 					board[i][j] = "wR"
 				}
@@ -456,7 +425,7 @@ func buildChessBoard() [8][8]string {
 				case 0:
 					board[i][j] = "bR"
 				case 1:
-					board[i][j] = "bKn"
+					board[i][j] = "bN"
 				case 2:
 					board[i][j] = "bB"
 				case 3:
@@ -466,7 +435,7 @@ func buildChessBoard() [8][8]string {
 				case 5:
 					board[i][j] = "bB"
 				case 6:
-					board[i][j] = "bKn"
+					board[i][j] = "bN"
 				case 7:
 					board[i][j] = "bR"
 				}
