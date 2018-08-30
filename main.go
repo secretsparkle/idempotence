@@ -32,8 +32,6 @@ func printBoard(board [8][8]string) {
 		}
 		fmt.Println()
 	}
-}
-
 // build the board!
 func buildChessBoard() [8][8]string {
 	var board [8][8]string
@@ -89,4 +87,25 @@ func buildChessBoard() [8][8]string {
 		}
 	}
 	return board
+}
+
+func winState(board [8][8]string) string {
+	whiteKing := false
+	blackKing := false
+	for _, row := range board {
+		for _, square := range row {
+			if square == "wK" {
+				whiteKing = true
+			} else if square == "bK" {
+				blackKing = true
+			}
+		}
+	}
+	if !whiteKing {
+		return "b" // return black as the winner
+	} else if !blackKing {
+		return "w"
+	} else {
+		return "f" // return no one as the winner
+	}
 }
