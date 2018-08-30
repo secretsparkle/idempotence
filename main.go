@@ -2,21 +2,36 @@
 package main
 
 import (
+	"./moves"
+	"./structures"
 	"fmt"
 )
 
-type Tree struct {
-	Board    [8][8]string
-	Children []*Tree // we will use append and make with this slice
-	// to check if it is a leaf, we can check if Children is nil
-}
-
 func main() {
-	board := buildChessBoard()
-	fmt.Println("array: ", board)
-	fmt.Println(winState(board))
+	game := new(structures.Tree)
+	game.Board = buildChessBoard()
+	moves.GenMovesLevel(game, "w")
+	printBoard(game.Board)
+	fmt.Println()
+	for _, possibilities := range game.Children {
+		printBoard(possibilities.Board)
+		fmt.Println()
+	}
 }
 
+// prints a more readable board
+func printBoard(board [8][8]string) {
+	for _, row := range board {
+		for _, square := range row {
+			fmt.Printf(square)
+			if square == "_" {
+				fmt.Printf("    ")
+			} else {
+				fmt.Printf("   ")
+			}
+		}
+		fmt.Println()
+	}
 // build the board!
 func buildChessBoard() [8][8]string {
 	var board [8][8]string
@@ -28,7 +43,7 @@ func buildChessBoard() [8][8]string {
 				case 0:
 					board[i][j] = "wR"
 				case 1:
-					board[i][j] = "wKn"
+					board[i][j] = "wN"
 				case 2:
 					board[i][j] = "wB"
 				case 3:
@@ -38,7 +53,7 @@ func buildChessBoard() [8][8]string {
 				case 5:
 					board[i][j] = "wB"
 				case 6:
-					board[i][j] = "wKn"
+					board[i][j] = "wN"
 				case 7:
 					board[i][j] = "wR"
 				}
@@ -51,7 +66,7 @@ func buildChessBoard() [8][8]string {
 				case 0:
 					board[i][j] = "bR"
 				case 1:
-					board[i][j] = "bKn"
+					board[i][j] = "bN"
 				case 2:
 					board[i][j] = "bB"
 				case 3:
@@ -61,7 +76,7 @@ func buildChessBoard() [8][8]string {
 				case 5:
 					board[i][j] = "bB"
 				case 6:
-					board[i][j] = "bKn"
+					board[i][j] = "bN"
 				case 7:
 					board[i][j] = "bR"
 				}
