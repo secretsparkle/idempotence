@@ -32,6 +32,8 @@ func printBoard(board [8][8]string) {
 		}
 		fmt.Println()
 	}
+}
+
 // build the board!
 func buildChessBoard() [8][8]string {
 	var board [8][8]string
