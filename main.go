@@ -2,20 +2,37 @@
 package main
 
 import (
-	"./moves"
 	"./structures"
+	"./tree"
 	"fmt"
 )
 
 func main() {
 	game := new(structures.Tree)
 	game.Board = buildChessBoard()
-	moves.GenMovesLevel(game, "w")
-	printBoard(game.Board)
-	fmt.Println()
-	for _, possibilities := range game.Children {
-		printBoard(possibilities.Board)
-		fmt.Println()
+	tree.GenNLevels(game, "w", 3)
+	printAllBoards(game)
+}
+
+// prints all boards generated
+func printAllBoards(tree *structures.Tree) {
+	printBoard(tree.Board)
+	boardStates := tree.Children
+	for true {
+		if boardStates == nil {
+			return
+		}
+		var children []*structures.Tree
+		for _, state := range boardStates {
+			printBoard(state.Board)
+			for _, subState := range state.Children {
+				children = append(children, subState)
+			}
+		}
+		boardStates = nil
+		for _, state := range children {
+			boardStates = append(boardStates, state)
+		}
 	}
 }
 

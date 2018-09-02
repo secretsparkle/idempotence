@@ -2,7 +2,6 @@ package moves
 
 import (
 	"../structures"
-	"fmt"
 	"strings"
 )
 
@@ -215,7 +214,7 @@ func genBishopMoves(board [8][8]string, row int, col int, enemy string) [][8][8]
 }
 
 func isCheck(board [8][8]string, kingMoveRow int, kingMoveCol int, player string, enemy string) bool {
-	moveBoards := genMoves(board, enemy, player)
+	moveBoards := GenMoves(board, enemy, player)
 	for _, moveBoard := range moveBoards.Children {
 		if string(moveBoard.Board[kingMoveRow][kingMoveCol][0]) == enemy {
 			return true
@@ -283,7 +282,7 @@ func genNewBranches(pieceMoves [][8][8]string, moves *structures.Tree) {
 }
 
 // abstract move generation driver
-func genMoves(board [8][8]string, player string, enemy string) *structures.Tree {
+func GenMoves(board [8][8]string, player string, enemy string) *structures.Tree {
 	moves := new(structures.Tree)
 	for row := 0; row < 8; row++ {
 		for col := 0; col < 8; col++ {
@@ -327,18 +326,6 @@ func genMoves(board [8][8]string, player string, enemy string) *structures.Tree 
 		}
 	}
 	return moves
-}
-
-// driver to produce all available moves, one level down, from a given board state
-func GenMovesLevel(tree *structures.Tree, player string) {
-	if player == "w" {
-		generatedBoards := genMoves(tree.Board, player, "b")
-		tree.Children = generatedBoards.Children
-		fmt.Println("genWhite")
-	} else if player == "b" {
-		generatedBoards := genMoves(tree.Board, player, "w")
-		tree.Children = generatedBoards.Children
-	}
 }
 
 func withinBoundaries(moveRow int, moveCol int) bool {
