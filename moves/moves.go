@@ -30,7 +30,7 @@ func movePawn(board [8][8]string, row int, col int, player string, moveType stri
 		// I kept in the corresponding operations to be
 		// verbose and transparent
 		switch moveType {
-		case "forward":
+		case "forwardOne":
 			newRow = row + 1
 			newCol = col
 		case "forwardTwo":
@@ -46,7 +46,7 @@ func movePawn(board [8][8]string, row int, col int, player string, moveType stri
 	} else if player == "b" {
 		enemy = "w"
 		switch moveType {
-		case "forward":
+		case "forwardOne":
 			newRow = row - 1
 			newCol = col
 		case "forwardTwo":
@@ -62,7 +62,15 @@ func movePawn(board [8][8]string, row int, col int, player string, moveType stri
 	}
 	if newRow == -1 || !withinBoundaries(newRow, newCol) {
 		return emptyBoard
-	} else if strings.Contains(moveType, "forward") && board[newRow][newCol] == "_" {
+	} else if strings.Contains(moveType, "forwardTwo") && player == "w" && board[newRow][newCol] == "_" && board[newRow-1][newCol] == "_" {
+		board[newRow][newCol] = board[row][col]
+		board[row][col] = "_"
+		return board
+	} else if strings.Contains(moveType, "forwardTwo") && player == "b" && board[newRow][newCol] == "_" && board[newRow+1][newCol] == "_" {
+		board[newRow][newCol] = board[row][col]
+		board[row][col] = "_"
+		return board
+	} else if strings.Contains(moveType, "forwardOne") && board[newRow][newCol] == "_" {
 		board[newRow][newCol] = board[row][col]
 		board[row][col] = "_"
 		return board
@@ -300,11 +308,9 @@ func GenMoves(board [8][8]string, player string, enemy string, genKing bool) *st
 		for col := 0; col < 8; col++ {
 			switch {
 			// Pawns
-			// TODO Pawns will currently jump over opponents when moving two spaces
-			// This is illegal and needs to be fixed!
 			case string(board[row][col][0]) == player && string(board[row][col][1]) == "P":
 				var pawnMoves [][8][8]string
-				pawnMoveForward := movePawn(board, row, col, player, "forward")
+				pawnMoveForward := movePawn(board, row, col, player, "forwardOne")
 				pawnMoves = append(pawnMoves, pawnMoveForward)
 				pawnMoveForwardTwo := movePawn(board, row, col, player, "forwardTwo")
 				pawnMoves = append(pawnMoves, pawnMoveForwardTwo)
