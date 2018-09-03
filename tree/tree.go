@@ -3,23 +3,38 @@ package tree
 import (
 	"../moves"
 	"../structures"
-	//"fmt"
+	"fmt" // for debugging purposes
 )
 
 // driver to produce all available moves, one level down, from a given board state
 func genMovesLevel(tree *structures.Tree, player string) {
 	if player == "w" {
-		generatedBoards := moves.GenMoves(tree.Board, player, "b")
+		generatedBoards := moves.GenMoves(tree.Board, player, "b", false)
 		tree.Children = generatedBoards.Children
 		//fmt.Println("genWhite")
 	} else if player == "b" {
-		generatedBoards := moves.GenMoves(tree.Board, player, "w")
+		generatedBoards := moves.GenMoves(tree.Board, player, "w", false)
 		tree.Children = generatedBoards.Children
 		//fmt.Println("genBlack")
 	}
 }
 
-// this function currently maxes out at two
+// prints a more readable board
+func printBoard(board [8][8]string) {
+	for _, row := range board {
+		for _, square := range row {
+			fmt.Printf(square)
+			if square == "_" {
+				fmt.Printf("    ")
+			} else {
+				fmt.Printf("   ")
+			}
+		}
+		fmt.Println()
+	}
+}
+
+// this function currently maxes out at two levels
 // stack overflow!
 func GenNLevels(tree *structures.Tree, player string, levels int) {
 	genMovesLevel(tree, player)
@@ -32,6 +47,8 @@ func GenNLevels(tree *structures.Tree, player string, levels int) {
 		}
 		var children []*structures.Tree
 		for _, state := range boardStates {
+			//printBoard(state.Board)
+			//fmt.Println()
 			genMovesLevel(state, player)
 			for _, subState := range state.Children {
 				children = append(children, subState)

@@ -213,8 +213,8 @@ func genBishopMoves(board [8][8]string, row int, col int, enemy string) [][8][8]
 	return bishopMoves
 }
 
-func isCheck(board [8][8]string, kingMoveRow int, kingMoveCol int, player string, enemy string) bool {
-	moveBoards := GenMoves(board, enemy, player)
+func isCheck(board [8][8]string, kingMoveRow int, kingMoveCol int, player string, enemy string, genKing bool) bool {
+	moveBoards := GenMoves(board, enemy, player, true)
 	for _, moveBoard := range moveBoards.Children {
 		if string(moveBoard.Board[kingMoveRow][kingMoveCol][0]) == enemy {
 			return true
@@ -223,49 +223,61 @@ func isCheck(board [8][8]string, kingMoveRow int, kingMoveCol int, player string
 	return false
 }
 
-// this function is far from finished. Each move must be checked to see if it
-// puts the king in check. This may involve calling genWhite/genBlack to see if
-// any of those moves takes the player's king.
-func genKingMoves(board [8][8]string, row int, col int, player string, enemy string) [][8][8]string {
+func genKingMove(board [8][8]string, row int, col int, newRow int, newCol int, player string, enemy string, genKing bool) [8][8]string {
+	var emptyBoard [8][8]string
+	emptyBoard[0][0] = "E"
+	kingMove := move(board, row, col, newRow, newCol, enemy)
+	// this logic will short-circuit if genKing is true. i.e., if we are already within a genKing
+	// statement, we don't need to check if this new genKing state will put the king in check, because
+	// we are only checking if the other king could take the our king on the next move, we are not actually
+	// generating a move for the move tree
+	if kingMove[0][0] != "E" && (genKing || !isCheck(kingMove, newRow, newCol, player, enemy, genKing)) {
+		return kingMove
+	} else {
+		return emptyBoard
+	}
+}
+
+func genKingMoves(board [8][8]string, row int, col int, player string, enemy string, genKing bool) [][8][8]string {
 	var kingMoves [][8][8]string
 	// up
-	kingMove := move(board, row, col, row-1, col, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row-1, col, player, enemy) {
+	kingMove := genKingMove(board, row, col, row-1, col, player, enemy, genKing)
+	if kingMove[0][0] != "E" {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// up-diagonal-right
-	kingMove = move(board, row, col, row-1, col+1, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row-1, col+1, player, enemy) {
+	kingMove = genKingMove(board, row, col, row-1, col+1, player, enemy, genKing)
+	if kingMove[0][0] != "E" {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// right
-	kingMove = move(board, row, col, row, col+1, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row, col+1, player, enemy) {
+	kingMove = genKingMove(board, row, col, row, col+1, player, enemy, genKing)
+	if kingMove[0][0] != "E" {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// down-diagonal-right
-	kingMove = move(board, row, col, row+1, col+1, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row+1, col+1, player, enemy) {
+	kingMove = genKingMove(board, row, col, row+1, col+1, player, enemy, genKing)
+	if kingMove[0][0] != "E" {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// down
-	kingMove = move(board, row, col, row+1, col, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row+1, col, player, enemy) {
+	kingMove = genKingMove(board, row, col, row+1, col, player, enemy, genKing)
+	if kingMove[0][0] != "E" {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// down-diagonal-left
-	kingMove = move(board, row, col, row+1, col-1, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row+1, col-1, player, enemy) {
+	kingMove = genKingMove(board, row, col, row+1, col-1, player, enemy, genKing)
+	if kingMove[0][0] != "E" {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// left
-	kingMove = move(board, row, col, row, col-1, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row, col-1, player, enemy) {
+	kingMove = genKingMove(board, row, col, row, col-1, player, enemy, genKing)
+	if kingMove[0][0] != "E" {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	// up-diagonal-left
-	kingMove = move(board, row, col, row-1, col-1, enemy)
-	if kingMove[0][0] != "E" && !isCheck(kingMove, row-1, col-1, player, enemy) {
+	kingMove = genKingMove(board, row, col, row-1, col-1, player, enemy, genKing)
+	if kingMove[0][0] != "E" {
 		kingMoves = append(kingMoves, kingMove)
 	}
 	return kingMoves
@@ -282,12 +294,14 @@ func genNewBranches(pieceMoves [][8][8]string, moves *structures.Tree) {
 }
 
 // abstract move generation driver
-func GenMoves(board [8][8]string, player string, enemy string) *structures.Tree {
+func GenMoves(board [8][8]string, player string, enemy string, genKing bool) *structures.Tree {
 	moves := new(structures.Tree)
 	for row := 0; row < 8; row++ {
 		for col := 0; col < 8; col++ {
 			switch {
 			// Pawns
+			// TODO Pawns will currently jump over opponents when moving two spaces
+			// This is illegal and needs to be fixed!
 			case string(board[row][col][0]) == player && string(board[row][col][1]) == "P":
 				var pawnMoves [][8][8]string
 				pawnMoveForward := movePawn(board, row, col, player, "forward")
@@ -320,7 +334,7 @@ func GenMoves(board [8][8]string, player string, enemy string) *structures.Tree 
 				genNewBranches(queenStraightMoves, moves)
 				// Kings
 			case string(board[row][col][0]) == player && string(board[row][col][1]) == "K":
-				kingMoves := genKingMoves(board, row, col, player, enemy)
+				kingMoves := genKingMoves(board, row, col, player, enemy, genKing)
 				genNewBranches(kingMoves, moves)
 			}
 		}

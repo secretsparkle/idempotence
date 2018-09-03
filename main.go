@@ -25,6 +25,7 @@ func printAllBoards(tree *structures.Tree) {
 		var children []*structures.Tree
 		for _, state := range boardStates {
 			printBoard(state.Board)
+			fmt.Println()
 			for _, subState := range state.Children {
 				children = append(children, subState)
 			}
