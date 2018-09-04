@@ -2,7 +2,6 @@
 package main
 
 import (
-	"./moves"
 	"./structures"
 	"fmt"
 )
@@ -10,12 +9,29 @@ import (
 func main() {
 	game := new(structures.Tree)
 	game.Board = buildChessBoard()
-	moves.GenMovesLevel(game, "w")
-	printBoard(game.Board)
-	fmt.Println()
-	for _, possibilities := range game.Children {
-		printBoard(possibilities.Board)
-		fmt.Println()
+	printAllBoards(game)
+}
+
+// prints all boards generated
+func printAllBoards(tree *structures.Tree) {
+	printBoard(tree.Board)
+	boardStates := tree.Children
+	for true {
+		if boardStates == nil {
+			return
+		}
+		var children []*structures.Tree
+		for _, state := range boardStates {
+			printBoard(state.Board)
+			fmt.Println()
+			for _, subState := range state.Children {
+				children = append(children, subState)
+			}
+		}
+		boardStates = nil
+		for _, state := range children {
+			boardStates = append(boardStates, state)
+		}
 	}
 }
 
@@ -32,6 +48,42 @@ func printBoard(board [8][8]string) {
 		}
 		fmt.Println()
 	}
+}
+
+// currently a rudimentary way of score the board
+func genScore(board [8][8]string, player string) int {
+	score := 0
+	for row := 0; row < 8; row++ {
+		for col := 0; col < 8; col++ {
+			switch {
+			case string(board[row][col][0]) == player && string(board[row][col][1]) == "P":
+				score += 1
+			case string(board[row][col][0]) != player && string(board[row][col][1]) == "P":
+				score -= 1
+			case string(board[row][col][0]) == player && string(board[row][col][1]) == "N":
+				score += 3
+			case string(board[row][col][0]) != player && string(board[row][col][1]) == "N":
+				score -= 3
+			case string(board[row][col][0]) == player && string(board[row][col][1]) == "B":
+				score += 3
+			case string(board[row][col][0]) != player && string(board[row][col][1]) == "B":
+				score -= 3
+			case string(board[row][col][0]) == player && string(board[row][col][1]) == "R":
+				score += 5
+			case string(board[row][col][0]) != player && string(board[row][col][1]) == "R":
+				score -= 5
+			case string(board[row][col][0]) == player && string(board[row][col][1]) == "Q":
+				score += 9
+			case string(board[row][col][0]) != player && string(board[row][col][1]) == "Q":
+				score -= 9
+			case string(board[row][col][0]) == player && string(board[row][col][1]) == "K":
+				score += 100
+			case string(board[row][col][0]) != player && string(board[row][col][1]) == "K":
+				score -= 100
+			}
+		}
+	}
+	return score
 }
 
 // build the board!
