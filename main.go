@@ -3,12 +3,14 @@ package main
 
 import (
 	"./structures"
+	"./tree"
 	"fmt"
 )
 
 func main() {
 	game := new(structures.Tree)
 	game.Board = buildChessBoard()
+	tree.GenNLevels(game, "w", 4)
 	printAllBoards(game)
 }
 
@@ -35,6 +37,7 @@ func printAllBoards(tree *structures.Tree) {
 	}
 }
 
+// delete after debugging use
 // prints a more readable board
 func printBoard(board [8][8]string) {
 	for _, row := range board {
