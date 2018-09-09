@@ -70,7 +70,6 @@ func GenNLevels(tree *structures.Tree, player string, levels int) {
 func MiniMax(tree *structures.Tree, levels int, player string, enemy string) {
 	populateLowestLevelScores(tree, levels, player, enemy)
 	for i := 0; i < levels-1; i++ {
-		// alternate player based on oddness of level
 		if levels%2 != 0 {
 			populateNextLevelScores(tree, player, enemy)
 		} else {
@@ -156,7 +155,6 @@ func populateLowestLevelScores(tree *structures.Tree, levels int, player string,
 
 // currently a rudimentary way of score the board
 func genScore(board [8][8]string, player string) int {
-	printBoard(board)
 	score := 0
 	for row := 0; row < 8; row++ {
 		for col := 0; col < 8; col++ {

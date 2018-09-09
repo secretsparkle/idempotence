@@ -10,8 +10,9 @@ import (
 func main() {
 	game := new(structures.Tree)
 	game.Board = buildChessBoard()
-	tree.GenNLevels(game, "w", 4)
-	tree.MiniMax(game, 4, "w", "b")
+	levels := 5
+	tree.GenNLevels(game, "w", levels)
+	tree.MiniMax(game, levels, "w", "b")
 	move := genMove(game)
 	printBoard(move)
 	//printAllBoards(game)
