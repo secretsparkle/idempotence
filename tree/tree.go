@@ -69,11 +69,11 @@ func GenNLevels(tree *structures.Tree, player string, levels int) {
 
 func MiniMax(tree *structures.Tree, levels int, player string, enemy string) {
 	populateLowestLevelScores(tree, levels, player, enemy)
-	for i := 0; i < levels-1; i++ {
+	for i := levels - 1; i >= 0; i-- {
 		if levels%2 != 0 {
-			populateNextLevelScores(tree, player, enemy)
+			populateNextLevelScores(tree, i, player, enemy)
 		} else {
-			populateNextLevelScores(tree, enemy, enemy)
+			populateNextLevelScores(tree, i, enemy, enemy)
 		}
 	}
 }
@@ -101,14 +101,14 @@ func GetMaxLevel(children []*structures.Tree) int {
 	return max
 }
 
-func populateNextLevelScores(tree *structures.Tree, player string, enemy string) {
+func populateNextLevelScores(tree *structures.Tree, level int, player string, enemy string) {
+	var children []*structures.Tree
 	boardStates := tree.Children
 	// first check if the final level before the top has been populated
 	if tree.Children[0].Score != -200 {
 		tree.Score = GetMaxLevel(tree.Children)
 	}
-	for true {
-		var children []*structures.Tree
+	for i := 0; i < level; i++ {
 		for _, state := range boardStates {
 			for _, subState := range state.Children {
 				children = append(children, subState)
@@ -118,12 +118,22 @@ func populateNextLevelScores(tree *structures.Tree, player string, enemy string)
 		for _, state := range children {
 			boardStates = append(boardStates, state)
 		}
-		if boardStates == nil {
-			break
-		} else if boardStates[0].Score != -200 && player == enemy {
-			boardStates[0].Parent.Score = getMinLevel(boardStates)
-		} else if boardStates[0].Score != -200 && player != enemy {
-			boardStates[0].Parent.Score = GetMaxLevel(boardStates)
+		children = nil
+	}
+	// just in case end is reached on accident
+	for _, state := range boardStates {
+		if state.Score == -200 && player == enemy {
+			state.Score = getMinLevel(state.Children)
+			//fmt.Println("Score: ", state.Parent.Score)
+			//fmt.Println("Level: ", level)
+			//printBoard(state.Board)
+			//fmt.Println()
+		} else if state.Score == -200 && player != enemy {
+			state.Score = GetMaxLevel(state.Children)
+			//fmt.Println("Score: ", state.Score)
+			//fmt.Println("Level: ", level)
+			//printBoard(state.Board)
+			//fmt.Println()
 		}
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"./structures"
 	"./tree"
 	"fmt"
+	"time"
 )
 
 func main() {
@@ -13,8 +14,12 @@ func main() {
 	levels := 3
 	player := "w"
 	enemy := "b"
+	//move := nextMove(game, levels, player, enemy)
+	//printBoard(move.Board)
 	for winState(game) != true {
 		move := nextMove(game, levels, player, enemy)
+		fmt.Println(move.Score)
+		fmt.Println(player)
 		printBoard(move.Board)
 		fmt.Println()
 		game = move
@@ -25,6 +30,7 @@ func main() {
 			player = "w"
 			enemy = "b"
 		}
+		time.Sleep(1000 * time.Millisecond)
 	}
 	//printAllBoards(game)
 }
