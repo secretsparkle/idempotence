@@ -5,7 +5,7 @@ import (
 	"./structures"
 	"./tree"
 	"fmt"
-	"time"
+	//"time"
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 			player = "w"
 			enemy = "b"
 		}
-		time.Sleep(1000 * time.Millisecond)
+		//time.Sleep(1000 * time.Millisecond)
 	}
 	//printAllBoards(game)
 }

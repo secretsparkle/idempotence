@@ -69,12 +69,8 @@ func GenNLevels(tree *structures.Tree, player string, levels int) {
 
 func MiniMax(tree *structures.Tree, levels int, player string, enemy string) {
 	populateLowestLevelScores(tree, levels, player, enemy)
-	for i := levels - 1; i >= 0; i-- {
-		if levels%2 != 0 {
-			populateNextLevelScores(tree, i, player, enemy)
-		} else {
-			populateNextLevelScores(tree, i, enemy, enemy)
-		}
+	for level := levels - 1; level >= 0; level-- {
+		populateLevelScores(tree, level)
 	}
 }
 
@@ -101,11 +97,11 @@ func GetMaxLevel(children []*structures.Tree) int {
 	return max
 }
 
-func populateNextLevelScores(tree *structures.Tree, level int, player string, enemy string) {
+func populateLevelScores(tree *structures.Tree, level int) {
 	var children []*structures.Tree
 	boardStates := tree.Children
 	// first check if the final level before the top has been populated
-	if tree.Children[0].Score != -200 {
+	if tree.Children[0].Score != -200 && level == 0 {
 		tree.Score = GetMaxLevel(tree.Children)
 	}
 	for i := 0; i < level; i++ {
@@ -122,13 +118,13 @@ func populateNextLevelScores(tree *structures.Tree, level int, player string, en
 	}
 	// just in case end is reached on accident
 	for _, state := range boardStates {
-		if state.Score == -200 && player == enemy {
+		if state.Score == -200 && level%2 != 0 {
 			state.Score = getMinLevel(state.Children)
 			//fmt.Println("Score: ", state.Parent.Score)
 			//fmt.Println("Level: ", level)
 			//printBoard(state.Board)
 			//fmt.Println()
-		} else if state.Score == -200 && player != enemy {
+		} else if state.Score == -200 && level%2 == 0 {
 			state.Score = GetMaxLevel(state.Children)
 			//fmt.Println("Score: ", state.Score)
 			//fmt.Println("Level: ", level)
