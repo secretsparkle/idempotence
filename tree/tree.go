@@ -11,14 +11,14 @@ const uninitializedScore int = -200
 // driver to produce all available moves, one level down, from a given board state
 func genMovesLevel(tree *structures.Tree, player string) {
 	if player == "w" {
-		generatedBoards := moves.GenMoves(tree.Board, player, "b", false)
+		generatedBoards := moves.GenMoves(tree.Board, player, "b", false, false)
 		for _, child := range generatedBoards.Children {
 			child.Parent = tree
 			child.Score = uninitializedScore
 		}
 		tree.Children = generatedBoards.Children
 	} else if player == "b" {
-		generatedBoards := moves.GenMoves(tree.Board, player, "w", false)
+		generatedBoards := moves.GenMoves(tree.Board, player, "w", false, false)
 		for _, child := range generatedBoards.Children {
 			child.Parent = tree
 			child.Score = uninitializedScore
@@ -69,12 +69,8 @@ func GenNLevels(tree *structures.Tree, player string, levels int) {
 
 func MiniMax(tree *structures.Tree, levels int, player string, enemy string) {
 	populateLowestLevelScores(tree, levels, player, enemy)
-	for i := 0; i < levels-1; i++ {
-		if levels%2 != 0 {
-			populateNextLevelScores(tree, player, enemy)
-		} else {
-			populateNextLevelScores(tree, enemy, enemy)
-		}
+	for level := levels - 1; level >= 0; level-- {
+		populateLevelScores(tree, level)
 	}
 }
 
@@ -82,6 +78,10 @@ func MiniMax(tree *structures.Tree, levels int, player string, enemy string) {
 // you can't pass operators as params in go? UGH
 // and also writing wrapper functions for gt and lt is way unsexy
 func getMinLevel(children []*structures.Tree) int {
+	// if inCheck eliminates all moves from one branch of tree
+	if len(children) < 1 {
+		return 1000
+	}
 	min := children[0].Score
 	for _, state := range children {
 		if min > state.Score {
@@ -92,6 +92,10 @@ func getMinLevel(children []*structures.Tree) int {
 }
 
 func GetMaxLevel(children []*structures.Tree) int {
+	// if inCheck eliminates all moves from one branch of tree
+	if len(children) < 1 {
+		return -1000
+	}
 	max := children[0].Score
 	for _, state := range children {
 		if max < state.Score {
@@ -101,14 +105,14 @@ func GetMaxLevel(children []*structures.Tree) int {
 	return max
 }
 
-func populateNextLevelScores(tree *structures.Tree, player string, enemy string) {
+func populateLevelScores(tree *structures.Tree, level int) {
+	var children []*structures.Tree
 	boardStates := tree.Children
 	// first check if the final level before the top has been populated
-	if tree.Children[0].Score != -200 {
+	if tree.Children[0].Score != -200 && level == 0 {
 		tree.Score = GetMaxLevel(tree.Children)
 	}
-	for true {
-		var children []*structures.Tree
+	for i := 0; i < level; i++ {
 		for _, state := range boardStates {
 			for _, subState := range state.Children {
 				children = append(children, subState)
@@ -118,12 +122,14 @@ func populateNextLevelScores(tree *structures.Tree, player string, enemy string)
 		for _, state := range children {
 			boardStates = append(boardStates, state)
 		}
-		if boardStates == nil {
-			break
-		} else if boardStates[0].Score != -200 && player == enemy {
-			boardStates[0].Parent.Score = getMinLevel(boardStates)
-		} else if boardStates[0].Score != -200 && player != enemy {
-			boardStates[0].Parent.Score = GetMaxLevel(boardStates)
+		children = nil
+	}
+	// just in case end is reached on accident
+	for _, state := range boardStates {
+		if state.Score == -200 && level%2 != 0 {
+			state.Score = getMinLevel(state.Children)
+		} else if state.Score == -200 && level%2 == 0 {
+			state.Score = GetMaxLevel(state.Children)
 		}
 	}
 }
@@ -135,6 +141,9 @@ func populateLowestLevelScores(tree *structures.Tree, levels int, player string,
 	}
 	for true {
 		var children []*structures.Tree
+		if len(boardStates) < 1 {
+			return
+		}
 		if boardStates[0].Children == nil {
 			break
 		}

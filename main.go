@@ -5,26 +5,50 @@ import (
 	"./structures"
 	"./tree"
 	"fmt"
+	"time"
 )
 
 func main() {
 	game := new(structures.Tree)
 	game.Board = buildChessBoard()
-	levels := 5
-	tree.GenNLevels(game, "w", levels)
-	tree.MiniMax(game, levels, "w", "b")
-	move := genMove(game)
-	printBoard(move)
+	levels := 3
+	player := "w"
+	enemy := "b"
+	//move := nextMove(game, levels, player, enemy)
+	//printBoard(move.Board)
+	for winState(game) != true {
+		move := nextMove(game, levels, player, enemy)
+		fmt.Println(move.Score)
+		fmt.Println(player)
+		printBoard(move.Board)
+		fmt.Println()
+		game = move
+		if player == "w" {
+			player = "b"
+			enemy = "w"
+		} else {
+			player = "w"
+			enemy = "b"
+		}
+		time.Sleep(1000 * time.Millisecond)
+	}
 	//printAllBoards(game)
 }
 
+func nextMove(game *structures.Tree, levels int, player string, enemy string) *structures.Tree {
+	tree.GenNLevels(game, player, levels)
+	tree.MiniMax(game, levels, player, enemy)
+	move := genMove(game)
+	return move
+}
+
 // leftmost best move
-func genMove(board *structures.Tree) [8][8]string {
-	var nextMove [8][8]string
+func genMove(board *structures.Tree) *structures.Tree {
+	var nextMove *structures.Tree
 	max := tree.GetMaxLevel(board.Children)
 	for _, state := range board.Children {
 		if state.Score == max {
-			nextMove = state.Board
+			nextMove = state
 			break
 		}
 	}
@@ -128,10 +152,10 @@ func buildChessBoard() [8][8]string {
 	return board
 }
 
-func winState(board [8][8]string) string {
+func winState(game *structures.Tree) bool {
 	whiteKing := false
 	blackKing := false
-	for _, row := range board {
+	for _, row := range game.Board {
 		for _, square := range row {
 			if square == "wK" {
 				whiteKing = true
@@ -141,10 +165,10 @@ func winState(board [8][8]string) string {
 		}
 	}
 	if !whiteKing {
-		return "b" // return black as the winner
+		return true // return black as the winner
 	} else if !blackKing {
-		return "w"
+		return true
 	} else {
-		return "f" // return no one as the winner
+		return false // return no one as the winner
 	}
 }
