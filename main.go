@@ -10,8 +10,25 @@ import (
 func main() {
 	game := new(structures.Tree)
 	game.Board = buildChessBoard()
-	tree.GenNLevels(game, "w", 4)
-	printAllBoards(game)
+	levels := 5
+	tree.GenNLevels(game, "w", levels)
+	tree.MiniMax(game, levels, "w", "b")
+	move := genMove(game)
+	printBoard(move)
+	//printAllBoards(game)
+}
+
+// leftmost best move
+func genMove(board *structures.Tree) [8][8]string {
+	var nextMove [8][8]string
+	max := tree.GetMaxLevel(board.Children)
+	for _, state := range board.Children {
+		if state.Score == max {
+			nextMove = state.Board
+			break
+		}
+	}
+	return nextMove
 }
 
 // prints all boards generated
@@ -24,6 +41,7 @@ func printAllBoards(tree *structures.Tree) {
 		}
 		var children []*structures.Tree
 		for _, state := range boardStates {
+			fmt.Println(state.Score)
 			printBoard(state.Board)
 			fmt.Println()
 			for _, subState := range state.Children {
