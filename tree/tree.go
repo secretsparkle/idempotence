@@ -128,16 +128,8 @@ func populateLevelScores(tree *structures.Tree, level int) {
 	for _, state := range boardStates {
 		if state.Score == -200 && level%2 != 0 {
 			state.Score = getMinLevel(state.Children)
-			//fmt.Println("Score: ", state.Parent.Score)
-			//fmt.Println("Level: ", level)
-			//printBoard(state.Board)
-			//fmt.Println()
 		} else if state.Score == -200 && level%2 == 0 {
 			state.Score = GetMaxLevel(state.Children)
-			//fmt.Println("Score: ", state.Score)
-			//fmt.Println("Level: ", level)
-			//printBoard(state.Board)
-			//fmt.Println()
 		}
 	}
 }
@@ -149,6 +141,9 @@ func populateLowestLevelScores(tree *structures.Tree, levels int, player string,
 	}
 	for true {
 		var children []*structures.Tree
+		if len(boardStates) < 1 {
+			return
+		}
 		if boardStates[0].Children == nil {
 			break
 		}

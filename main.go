@@ -5,13 +5,13 @@ import (
 	"./structures"
 	"./tree"
 	"fmt"
-	//"time"
+	"time"
 )
 
 func main() {
 	game := new(structures.Tree)
 	game.Board = buildChessBoard()
-	levels := 4
+	levels := 3
 	player := "w"
 	enemy := "b"
 	//move := nextMove(game, levels, player, enemy)
@@ -30,7 +30,7 @@ func main() {
 			player = "w"
 			enemy = "b"
 		}
-		//time.Sleep(1000 * time.Millisecond)
+		time.Sleep(1000 * time.Millisecond)
 	}
 	//printAllBoards(game)
 }
