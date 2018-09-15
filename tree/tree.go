@@ -11,14 +11,14 @@ const uninitializedScore int = -200
 // driver to produce all available moves, one level down, from a given board state
 func genMovesLevel(tree *structures.Tree, player string) {
 	if player == "w" {
-		generatedBoards := moves.GenMoves(tree.Board, player, "b", false)
+		generatedBoards := moves.GenMoves(tree.Board, player, "b", false, false)
 		for _, child := range generatedBoards.Children {
 			child.Parent = tree
 			child.Score = uninitializedScore
 		}
 		tree.Children = generatedBoards.Children
 	} else if player == "b" {
-		generatedBoards := moves.GenMoves(tree.Board, player, "w", false)
+		generatedBoards := moves.GenMoves(tree.Board, player, "w", false, false)
 		for _, child := range generatedBoards.Children {
 			child.Parent = tree
 			child.Score = uninitializedScore
@@ -78,6 +78,10 @@ func MiniMax(tree *structures.Tree, levels int, player string, enemy string) {
 // you can't pass operators as params in go? UGH
 // and also writing wrapper functions for gt and lt is way unsexy
 func getMinLevel(children []*structures.Tree) int {
+	// if inCheck eliminates all moves from one branch of tree
+	if len(children) < 1 {
+		return 1000
+	}
 	min := children[0].Score
 	for _, state := range children {
 		if min > state.Score {
@@ -88,6 +92,10 @@ func getMinLevel(children []*structures.Tree) int {
 }
 
 func GetMaxLevel(children []*structures.Tree) int {
+	// if inCheck eliminates all moves from one branch of tree
+	if len(children) < 1 {
+		return -1000
+	}
 	max := children[0].Score
 	for _, state := range children {
 		if max < state.Score {

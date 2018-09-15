@@ -222,7 +222,7 @@ func genBishopMoves(board [8][8]string, row int, col int, enemy string) [][8][8]
 }
 
 func isCheck(board [8][8]string, kingMoveRow int, kingMoveCol int, player string, enemy string, genKing bool) bool {
-	moveBoards := GenMoves(board, enemy, player, true)
+	moveBoards := GenMoves(board, enemy, player, true, true)
 	for _, moveBoard := range moveBoards.Children {
 		if string(moveBoard.Board[kingMoveRow][kingMoveCol][0]) == enemy {
 			return true
@@ -291,6 +291,29 @@ func genKingMoves(board [8][8]string, row int, col int, player string, enemy str
 	return kingMoves
 }
 
+func determineKingPosition(board [8][8]string, player string) (int, int) {
+	for row := 0; row < 8; row++ {
+		for col := 0; col < 8; col++ {
+			if board[row][col] == (player + "K") {
+				return row, col
+			}
+		}
+	}
+	return -1, -1
+}
+
+func inCheck(board [8][8]string, player string, enemy string, genKing bool) *structures.Tree {
+	moves := GenMoves(board, player, enemy, true, true)
+	newMoves := new(structures.Tree)
+	for _, move := range moves.Children {
+		kingRow, kingCol := determineKingPosition(move.Board, player)
+		if kingRow != -1 && kingCol != -1 && !isCheck(move.Board, kingRow, kingCol, player, enemy, genKing) {
+			newMoves.Children = append(newMoves.Children, move)
+		}
+	}
+	return newMoves
+}
+
 func genNewBranches(pieceMoves [][8][8]string, moves *structures.Tree) {
 	for _, move := range pieceMoves {
 		if move[0][0] != "E" {
@@ -302,8 +325,16 @@ func genNewBranches(pieceMoves [][8][8]string, moves *structures.Tree) {
 }
 
 // abstract move generation driver
-func GenMoves(board [8][8]string, player string, enemy string, genKing bool) *structures.Tree {
+func GenMoves(board [8][8]string, player string, enemy string, genKing bool, alreadyRunningCheck bool) *structures.Tree {
 	moves := new(structures.Tree)
+	// generate moves specifically to get king out of check
+	kingRow, kingCol := determineKingPosition(board, player)
+	if kingRow == -1 && kingCol == -1 {
+		return moves
+	}
+	if !alreadyRunningCheck && isCheck(board, kingRow, kingCol, player, enemy, true) {
+		return inCheck(board, player, enemy, genKing)
+	}
 	for row := 0; row < 8; row++ {
 		for col := 0; col < 8; col++ {
 			switch {

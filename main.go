@@ -11,7 +11,7 @@ import (
 func main() {
 	game := new(structures.Tree)
 	game.Board = buildChessBoard()
-	levels := 3
+	levels := 4
 	player := "w"
 	enemy := "b"
 	//move := nextMove(game, levels, player, enemy)
